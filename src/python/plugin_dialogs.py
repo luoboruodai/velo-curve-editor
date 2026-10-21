@@ -11,7 +11,7 @@ INPUTS=('save_name','save_text','grid_x','grid_y','hex_curve','hex_background','
 CHOICES=('loc_left','loc_right','loc_top','loc_bottom','page_interface','page_presets','page_theme','page_graph',
          'compact','motion','auto_load','show_speed','import','export','theme_edit','fit','reset',
          'thumb_graph','thumb_text','thumb_image','choose_image','cancel','confirm','close',
-         'color_blue','color_cyan','color_amber')
+         'color_blue','color_cyan','color_amber','export_keyframes')
 SLIDERS=('box_size','precision','speed_strength')
 TOGGLE=('compact','motion','auto_load','show_speed')
 
@@ -138,6 +138,7 @@ def action(c,name):
         if q.get('modal_kind')=='save':save_preset(c)
         else:close_modal(c)
     elif key in ('import','export'):preset_file(c,key)
+    elif key=='export_keyframes':c.op('keyframe_export').module.export(c)
     elif key=='fit':c.op('graph_engine').module.action(c,'view_fit')
     elif key=='reset':
         for field in m.UI_KEYS:s[field]=m.DEFAULTS[field]
@@ -273,7 +274,7 @@ def layout(c):
     q['dialog_layout_key']=key;q['dialogs_hidden']=False
     full=False
     pw=min(392.,width-24)
-    section_heights={'interface':114,'presets':124,'theme':80,'graph':158}
+    section_heights={'interface':114,'presets':124,'theme':80,'graph':174}
     if kind=='settings':
         page=q.get('dialog_page','interface')
         # Content + 16px breathing room + fixed footer; no large empty slab.
@@ -341,6 +342,7 @@ def layout(c):
                 label('row8','贝塞尔速度背景',sx+10,sy+73,sw-70);toggle('show_speed',s['show_speed'],sx+sw-53,sy+69)
                 rail('speed_strength',s['speed_strength'],.05,.65,sx+80,sy+98,max(44,sw-138))
                 label('preview_text','强度',sx+10,sy+103,65)
+                button('export_keyframes','写入关键帧',sx+10,sy+126,sw-20,28,True)
             sy += h+12
         button('reset','恢复默认',x+14,y+ph-38,(pw-34)/2,32);button('fit','适配当前曲线',x+20+(pw-34)/2,y+ph-38,(pw-34)/2,32,True)
     elif kind=='save':

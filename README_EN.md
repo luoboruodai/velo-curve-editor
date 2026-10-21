@@ -14,6 +14,13 @@ Velo is a native TouchDesigner COMP for **Bezier, Elastic and Bounce** curve edi
 - Elastic and Bounce parameters with labeled sliders and readable values.
 - Value and speed use the same sampling model rather than separate approximations.
 
+### Native animation keyframes
+
+- **Settings → Graph → 写入关键帧** exports the current curve to a native Animation COMP.
+- The new node is named `velo_animation[_NN]` among the component's direct children, so repeated exports do not overwrite existing animation nodes.
+- The `fade` channel contains **258 `linear()` keys at frames 0–257, including both endpoints**.
+- The live CHOP output remains one `fade` channel with 257 samples and endpoints `0 → 1`.
+
 ### Presets and EaseCopy
 
 - Built-in and user presets, ordering, deletion, import/export and card-size adjustment.
@@ -30,7 +37,7 @@ Velo is a native TouchDesigner COMP for **Bezier, Elastic and Bounce** curve edi
 
 ## Installation
 
-1. Download `Velo_v1.0.0_macOS_Windows.zip` from [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/latest).
+1. Download `Velo_v1.1.0_macOS_Windows.zip` from [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/latest).
 2. Unzip it and drag `Velo.tox` into your TouchDesigner network.
 3. Connect the first CHOP output to the downstream node that needs the fade signal.
 
@@ -50,6 +57,7 @@ Velo is a native TouchDesigner COMP for **Bezier, Elastic and Bounce** curve edi
 - Use **Fit** to include all Bezier anchors and handles in the viewport.
 - Switch between value and speed editing without changing the underlying sampling contract.
 - Preserve or clear the EaseCopy buffer explicitly; an empty buffer cannot be pasted.
+- Use **写入关键帧** only when you want a separate native animation node; normal live CHOP output does not require export.
 
 ## Development and verification
 
@@ -58,6 +66,6 @@ for test in tools/test_*.py; do python3 "$test"; done
 bash tools/build_tox.sh
 ```
 
-The release contains 67 passing offline regressions, repeated deterministic builds and native TouchDesigner checks. See [Verification](docs/VERIFICATION.md) and [Changelog](CHANGELOG.md).
+The release contains 69 passing offline regressions, repeated deterministic builds and native TouchDesigner checks. The keyframe export test covers the real settings action, Animation COMP, `fade` channel and editable `keys` table; it does not claim separate manual-drag verification inside Animation Editor.
 
-![Velo settings](docs/images/velo-settings.png)
+See [Verification](docs/VERIFICATION.md), [Changelog](CHANGELOG.md) and [Release Notes](docs/RELEASE_NOTES.md). Future maintainers can start with [AGENTS.md](AGENTS.md) and [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md).

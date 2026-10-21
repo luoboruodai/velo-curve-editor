@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.1.0 — 2026-10-21
+
+### English
+
+- Added **Settings → Graph → 写入关键帧** for opt-in native animation authoring.
+- Exports the current curve to a uniquely named `velo_animation[_NN]` Animation COMP without overwriting existing animation nodes.
+- Writes one `fade` channel with 258 `linear()` keys at frames 0–257, including both endpoints.
+- Preserves the live output contract: one `fade` channel, 257 samples and endpoints `0 → 1`.
+- Added offline export regressions and native TouchDesigner verification of the settings action, Animation COMP, channel and editable `keys` table.
+- Added bilingual release documentation and a compact architecture / troubleshooting handoff for future maintainers.
+- 69 offline regressions pass. Windows receives the same native TOX but remains runtime-unverified in this environment.
+
+### 中文
+
+- 新增 **设置 → 图形 → 写入关键帧**，按需创建原生动画数据。
+- 将当前曲线导出为唯一命名的 `velo_animation[_NN]` Animation COMP，不覆盖已有动画节点。
+- 写入一个 `fade` 通道，包含 0–257 帧共 258 个 `linear()` 关键帧（含首尾）。
+- 保持实时输出契约：单通道 `fade`、257 样本、首尾 `0 → 1`。
+- 新增离线导出回归，并在原生 TD 中验证设置按钮、Animation COMP、通道和可编辑 `keys` 表。
+- 新增双语发布文档，以及面向后续维护者的精简架构与堵点交接。
+- 69 项离线回归通过。Windows 提供同一原生 TOX，但本环境仍未进行运行实测。
+
 ## 1.0.0 — 2026-10-21
 
 ### English

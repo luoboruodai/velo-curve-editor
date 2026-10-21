@@ -14,6 +14,7 @@ mappings = {
     'ui_style.py': ('ui_style.text', 'curve_logic.text'),
     'curve_model.py': ('curve_model.text', 'curve_logic.text'),
     'bezier_handles.py': ('bezier_handles.text', 'curve_logic.text'),
+    'keyframe_export.py': ('keyframe_export.text', 'curve_logic.text'),
     'graph_engine.py': ('graph_engine.text', 'curve_logic.text'),
     'plugin_dialogs.py': ('plugin_dialogs.text', 'curve_logic.text'),
     'preset_layout.py': ('preset_layout.text', 'curve_logic.text'),

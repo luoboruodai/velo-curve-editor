@@ -4,19 +4,19 @@
 
 [中文文档](README_CN.md) · [English documentation](README_EN.md) · [Download / 下载](https://github.com/luoboruodai/velo-curve-editor/releases/latest)
 
-![TouchDesigner](https://img.shields.io/badge/TouchDesigner-2025.31550-blue) ![macOS verified](https://img.shields.io/badge/macOS-verified-brightgreen) ![Windows package](https://img.shields.io/badge/Windows-package-blue) ![Tests](https://img.shields.io/badge/tests-67_passed-brightgreen)
+![Version](https://img.shields.io/badge/version-1.1.0-blue) ![TouchDesigner](https://img.shields.io/badge/TouchDesigner-2025.31550-blue) ![macOS verified](https://img.shields.io/badge/macOS-verified-brightgreen) ![Windows package](https://img.shields.io/badge/Windows-package-blue) ![Tests](https://img.shields.io/badge/tests-69_passed-brightgreen)
 
 ![Velo main interface](docs/images/velo-main.png)
 
 ## Overview / 简介
 
-Velo is a native COMP for editing **Bezier, Elastic and Bounce** curves in TouchDesigner. It combines multi-keyframe value editing, synchronized speed visualization, presets, EaseCopy and adaptive themes without WebRender, HTML or an external frontend runtime.
+Velo is a native COMP for editing **Bezier, Elastic and Bounce** curves in TouchDesigner. It combines multi-keyframe value editing, synchronized speed visualization, presets, EaseCopy, adaptive themes and native animation-keyframe export without WebRender, HTML or an external frontend runtime.
 
-Velo 是原生 TD 曲线编辑组件，支持多关键帧、速度背景、预设、EaseCopy 和主题切换，无需浏览器或外部前端运行时。
+Velo 是原生 TD 曲线编辑组件，支持多关键帧、速度背景、预设、EaseCopy、主题切换和原生动画关键帧导出，无需浏览器或外部前端运行时。
 
 ## Download / 下载
 
-- **Package / 发布包**: `Velo_v1.0.0_macOS_Windows.zip`
+- **Package / 发布包**: `Velo_v1.1.0_macOS_Windows.zip`
 - **Direct component / 直接组件**: [`dist/Velo.tox`](dist/Velo.tox)
 - **Evaluation copy / 评估副本**: `dist/Velo_Demo.tox`
 - **Host / 宿主**: TouchDesigner 2025.31550 or a compatible later version / 或兼容的更新版本
@@ -35,16 +35,23 @@ Output contract / 输出契约: one `fade` channel, 257 samples, endpoints `0 �
 
 - Bezier / Elastic / Bounce curve models and synchronized speed display / 三类曲线与同步速度显示
 - Multi-keyframe editing and monotonic-safe flexible Bezier handles / 多关键帧与保持时间正向的自由拉杆
+- Native `animationCOMP` export with editable `fade` keyframes / 原生 `animationCOMP` 与可编辑 `fade` 关键帧导出
 - Preset browser, sorting, deletion, import/export / 预设浏览、排序、删除及导入导出
 - EaseCopy copy, integer-multiple paste, ease/value separation, passthrough preservation / EaseCopy 复制、整数倍粘贴、缓动／数值分离及直通保留
 - Adaptive accent themes, white handles and knobs, translucent glass view tools / 自适应主题、白色拉杆旋钮、半透明毛玻璃工具条
 - Native CHOP output for downstream TD networks / 原生 CHOP 输出供下游使用
 
-See [verification evidence](docs/VERIFICATION.md) / 查看[验证证据](docs/VERIFICATION.md)。
+## Write animation keyframes / 写入动画关键帧
+
+Open **Settings → Graph → 写入关键帧**. Velo creates a uniquely named `velo_animation[_NN]` Animation COMP inside the current component, with one `fade` channel and **258 linear keys at frames 0–257, including both endpoints**. Existing animation nodes are not overwritten.
+
+打开 **设置 → 图形 → 写入关键帧**。Velo 会在当前组件内创建唯一命名的 `velo_animation[_NN]` Animation COMP，包含一个 `fade` 通道和 **0–257 帧共 258 个 `linear()` 关键帧（含首尾）**，不会覆盖已有动画节点。
+
+The native settings action, Animation COMP, channel and editable `keys` table were verified on macOS. Manual keyframe dragging inside Animation Editor is not separately claimed as tested. / 已验证原生设置按钮、Animation COMP、通道和可编辑 `keys` 表；不单独宣称已验收 Animation Editor 内的手动拖拽。
 
 ## Development / 开发
 
-- `src/python/`: curve model, handle math, native layout, dialogs and EaseCopy / 曲线模型、手柄数学、原生布局、弹层与 EaseCopy
+- `src/python/`: curve model, handle math, native layout, dialogs, EaseCopy and keyframe export / 曲线模型、手柄数学、原生布局、弹层、EaseCopy 与关键帧导出
 - `src/curve_editor.tox.dir/`: editable expanded native component / 可编辑展开组件
 - `tools/`: UI generator, TOX build and regression tests / UI 生成器、TOX 构建与回归测试
 
@@ -66,3 +73,5 @@ bash tools/build_tox.sh
 - [English documentation](README_EN.md)
 - [Changelog / 更新日志](CHANGELOG.md)
 - [Verification / 验证](docs/VERIFICATION.md)
+- [Release announcement / 发布文案](docs/ANNOUNCEMENT.md)
+- [Agent handoff / Agent 交接](AGENTS.md) and [project context / 项目上下文](PROJECT_CONTEXT.md)

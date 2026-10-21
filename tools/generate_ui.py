@@ -433,7 +433,7 @@ for key,value in {'X1':1/3,'Y1':1/3,'X2':2/3,'Y2':2/3}.items():root_parm=set_par
 
 # U014: native curve engine and real dialogs; source remains in editable Python modules.
 import runpy
-for module in ('curve_model','graph_engine','plugin_dialogs','preset_layout','easecopy','bezier_handles'):
+for module in ('curve_model','graph_engine','plugin_dialogs','preset_layout','easecopy','bezier_handles','keyframe_export'):
     put(module+'.n', 'DAT:text\ntile 0 -120 130 90\nflags =  viewer 1 parlanguage 0\ncolor 0.67 0.67 0.67 \nend\n')
     put(module+'.parm','?\nlanguage 0 python\n?\n')
     encode_text(module+'.text',(ROOT/'src/python'/(module+'.py')).read_text(encoding='utf-8'),'curve_logic.text')
