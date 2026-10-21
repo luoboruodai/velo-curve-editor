@@ -1,0 +1,22 @@
+?
+label 0 +
+x 0 24
+y 0 600
+w 0 96
+h 0 32
+bgcolorr 0 0.09
+bgcolorg 0 0.09
+bgcolorb 0 0.09
+bgalpha 0 0
+borderover 0 off
+enablecloning 0 off
+clone 17 "" op.TDTox.op('defaultCOMPs/button')
+enableexternaltox 0 off
+externaltox 48 "" "parent.sys.fileFolder + '/TDPackages/button/button.tox'"
+relpath 0 externaltox
+colorr 0 0.235
+colorg 0 0.235
+colorb 0 0.235
+top 0 param1_up_rounded
+topfill 0 off
+?

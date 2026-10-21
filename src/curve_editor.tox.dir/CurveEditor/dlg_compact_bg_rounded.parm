@@ -1,0 +1,28 @@
+?
+outputresolution 0 custom
+resolutionw 0 96
+resolutionh 0 32
+sizex 0 1
+sizey 0 1
+sizeunit 0 fraction
+centerx 0 0
+centery 0 0
+centerunit 0 fraction
+justifyh 0 center
+justifyv 0 center
+cornerradius 0 10
+cornerradiusunit 0 pixels
+fillalpha 0 1
+bgalpha 0 0
+antialias 0 on
+softness 0 0
+borderwidthunit 0 pixels
+fillcolorr 49 0 "op('dlg_compact_bg').par.bgcolorr * .9"
+fillcolorg 49 0 "op('dlg_compact_bg').par.bgcolorg * .9"
+fillcolorb 49 0 "op('dlg_compact_bg').par.bgcolorb * .9"
+borderwidth 0 1
+borderalpha 0 1
+borderr 0 0.32
+borderg 0 0.32
+borderb 0 0.32
+?

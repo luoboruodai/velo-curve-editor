@@ -1,0 +1,8 @@
+PROJECT.md
+private/
+.DS_Store
+*.bkp*
+__pycache__/
+*.pyc
+
+release/

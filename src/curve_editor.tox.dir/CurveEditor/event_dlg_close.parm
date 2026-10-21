@@ -1,0 +1,8 @@
+?
+panels 16 dlg_close parent()
+panelvalue 0 lselect
+language 0 python
+offtoon 0 on
+ontooff 0 off
+valuechange 0 off
+?

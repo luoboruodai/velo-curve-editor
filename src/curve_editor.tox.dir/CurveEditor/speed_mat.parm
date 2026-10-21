@@ -1,0 +1,16 @@
+?
+widthnear 0 1.1
+widthfar 0 1.1
+depthtest 0 off
+depthwriting 0 off
+pointnearalpha 0 0
+pointfaralpha 0 0
+linenearalpha 0 1
+linefaralpha 0 1
+linenearcolorr 0 0.18
+linenearcolorg 0 0.23
+linenearcolorb 0 0.29
+linefarcolorr 0 0.18
+linefarcolorg 0 0.23
+linefarcolorb 0 0.29
+?

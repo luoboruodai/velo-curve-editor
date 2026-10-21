@@ -1,0 +1,15 @@
+?
+text 0 Aa
+callbacks 0 preview_word_callbacks
+font 0 "PingFang SC"
+fontsize 0 13
+fontcolorr 0 0.9
+fontcolorg 0 0.9
+fontcolorb 0 0.9
+fontalpha 17 1 .18+(.82)*(1-op('curve_logic').module.values(parent())[min(256,int(op('curve_logic').module.st(parent()).get('u',0)*256))])
+alignx 0 right
+x 0 333
+y 0 134
+w 0 154
+h 0 24
+?

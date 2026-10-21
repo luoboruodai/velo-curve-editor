@@ -1,0 +1,10 @@
+?
+camera 0 preset_camera
+geometry 0 "preset_cards_geo preset_frames_geo preset_selected_geo preset_hover_geo preset_curves_geo"
+resolutionw 0 512
+resolutionh 0 116
+bgcolorr 0 0.165
+bgcolorg 0 0.165
+bgcolorb 0 0.165
+bgalpha 0 0
+?

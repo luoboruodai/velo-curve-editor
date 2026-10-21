@@ -1,0 +1,15 @@
+?
+x 0 24
+y 0 600
+w 0 96
+h 0 12
+bgcolorr 0 0.235
+bgcolorg 0 0.235
+bgcolorb 0 0.235
+bgalpha 0 0
+clickthrough 0 on
+layer 0 106
+top 0 dlg_hex_background_bg_rounded
+topfill 0 off
+display 0 off
+?

@@ -1,0 +1,14 @@
+?
+text 0 ﻿"预设库 · 点击载入"
+callbacks 0 instructions_callbacks
+font 0 "PingFang SC"
+fontsize 0 11
+fontcolorr 0 0.58
+fontcolorg 0 0.58
+fontcolorb 0 0.58
+alignx 0 left
+x 0 24
+y 0 133
+w 0 300
+h 0 25
+?

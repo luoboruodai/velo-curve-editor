@@ -1,0 +1,14 @@
+?
+text 0 ﻿"亮 → 暗                       时间 0 → 100%"
+callbacks 0 axis_callbacks
+font 0 "PingFang SC"
+fontsize 0 12
+fontcolorr 0 0.8
+fontcolorg 0 0.87
+fontcolorb 0 0.94
+alignx 0 left
+x 0 32
+y 0 437
+w 0 450
+h 0 18
+?

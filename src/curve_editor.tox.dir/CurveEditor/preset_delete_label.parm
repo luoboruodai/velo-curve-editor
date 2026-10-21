@@ -1,0 +1,16 @@
+?
+text 0 "松开以移动预设"
+font 0 "PingFang SC"
+fontsize 0 10
+fontcolorr 0 0.9
+fontcolorg 0 0.9
+fontcolorb 0 0.9
+alignx 0 center
+clickthrough 0 on
+x 0 24
+y 0 100
+w 0 120
+h 0 20
+layer 0 46
+display 0 off
+?

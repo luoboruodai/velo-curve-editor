@@ -1,0 +1,8 @@
+?
+panels 16 param2_hit parent()
+panelvalue 0 "lselect u v"
+language 0 python
+offtoon 0 on
+ontooff 0 off
+valuechange 0 on
+?

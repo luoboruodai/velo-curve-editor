@@ -1,0 +1,10 @@
+?
+camera 0 plot_camera
+geometry 0 "grid_main_geo grid_geo speed_geo curve_geo handle_geo anchor_geo selected_keyframe_geo playhead_geo"
+resolutionw 0 464
+resolutionh 0 272
+bgcolorr 0 0.133
+bgcolorg 0 0.133
+bgcolorb 0 0.133
+bgalpha 0 0
+?

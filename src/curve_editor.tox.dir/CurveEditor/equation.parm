@@ -1,0 +1,16 @@
+?
+text 0 ""
+callbacks 0 equation_callbacks
+font 0 "Menlo"
+fontsize 0 10
+fontcolorr 0 0.96
+fontcolorg 0 0.96
+fontcolorb 0 0.96
+alignx 0 left
+x 0 24
+y 0 109
+w 0 464
+h 0 23
+layer 0 1
+wordwrap 0 off
+?

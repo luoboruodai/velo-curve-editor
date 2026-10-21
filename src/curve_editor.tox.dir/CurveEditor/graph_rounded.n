@@ -1,0 +1,9 @@
+TOP:rectangle
+tile 0 0 130 90
+flags =  parlanguage 0
+inputs
+{
+0 	plot_render
+}
+color 0.67 0.67 0.67 
+end

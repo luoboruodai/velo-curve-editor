@@ -1,0 +1,17 @@
+?
+label 0 ﻿平滑
+x 0 378
+y 0 67
+w 0 110
+h 0 32
+bgcolorr 0 0.12
+bgcolorg 0 0.2
+bgcolorb 0 0.29
+bgalpha 0 1
+borderover 0 off
+enablecloning 0 off
+clone 17 "" op.TDTox.op('defaultCOMPs/button')
+enableexternaltox 0 off
+externaltox 48 "" "parent.sys.fileFolder + '/TDPackages/button/button.tox'"
+relpath 0 externaltox
+?

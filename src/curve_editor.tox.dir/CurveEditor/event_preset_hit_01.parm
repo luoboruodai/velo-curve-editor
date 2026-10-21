@@ -1,0 +1,8 @@
+?
+panels 16 preset_hit_01 parent()
+panelvalue 0 "lselect rselect u v"
+language 0 python
+offtoon 0 on
+ontooff 0 on
+valuechange 0 on
+?

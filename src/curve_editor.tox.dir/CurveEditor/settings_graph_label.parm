@@ -1,0 +1,19 @@
+?
+text 0 "Graph"
+font 0 "PingFang SC"
+fontsize 0 10
+fontcolorr 0 0.67
+fontcolorg 0 0.67
+fontcolorb 0 0.67
+alignx 0 left
+clickthrough 0 on
+x 0 24
+y 0 100
+w 0 120
+h 0 20
+layer 0 107
+bgalpha 0 1
+bgcolorr 0 0.235
+bgcolorg 0 0.235
+bgcolorb 0 0.235
+?

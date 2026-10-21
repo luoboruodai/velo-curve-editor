@@ -1,0 +1,15 @@
+?
+w 0 760
+h 0 760
+bgcolorr 0 0.196
+bgcolorg 0 0.196
+bgcolorb 0 0.196
+bgalpha 0 1
+opviewer 0 ""
+enableexternaltox 0 off
+Equation 67109184 "{\"curve\":{\"bezier\":[0.42,0.0,0.58,1.0],\"bounce\":{\"bounces\":4,\"damping\":0.45},\"direction\":\"inout\",\"elastic\":{\"amplitude\":1.0,\"period\":0.3},\"mode\":\"bezier\"},\"format\":\"td-curve-editor\",\"version\":2}"
+X1 0 0.3333333333333333
+Y1 0 0.3333333333333333
+X2 0 0.6666666666666666
+Y2 0 0.6666666666666666
+?

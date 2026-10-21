@@ -1,0 +1,24 @@
+?
+text 0 ""
+font 0 "PingFang SC"
+fontsize 0 11
+fontcolorr 0 0.86
+fontcolorg 0 0.86
+fontcolorb 0 0.86
+alignx 0 left
+clickthrough 0 off
+x 0 24
+y 0 100
+w 0 120
+h 0 20
+layer 0 111
+editmode 0 editable
+type 0 string
+callbacks 0 dlg_input_callbacks
+bgalpha 0 0
+bgcolorr 0 0.133
+bgcolorg 0 0.133
+bgcolorb 0 0.133
+wordwrap 0 off
+display 0 off
+?

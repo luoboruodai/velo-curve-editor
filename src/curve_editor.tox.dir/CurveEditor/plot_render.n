@@ -1,0 +1,5 @@
+TOP:render
+tile 0 0 130 90
+flags =  parlanguage 0
+color 0.67 0.67 0.67 
+end
