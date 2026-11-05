@@ -4,7 +4,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const model = require('../VeloAE/js/curve-model.js');
-const source = fs.readFileSync(require('node:path').join(__dirname, '../VeloAE/js/main.js'), 'utf8');
+const source = fs.readFileSync(require('node:path').join(__dirname, '../VeloAE/js/main.js'), 'utf8').replace(/\r\n/g, '\n');
 function declaration(name) {
   const start = source.indexOf(`  function ${name}(`);
   assert(start >= 0, `${name} exists`);
