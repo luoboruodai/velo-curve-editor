@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.2.0 for After Effects — 2026-11-06
+
+### English
+
+- Added the local AE CEP curve editor with Bezier, Elastic and Bounce, true speed derivatives, multi-point shape-preserving editing and adaptive smoothing.
+- Added scalar native Temporal Ease, sampled multi-property application, EaseCopy, full preset import/export, themes and four interface languages.
+- Native save/cancel uses the system file dialog. Invalid preset files leave existing configurations untouched; clipboard permission failures reach the existing fallbacks.
+- The native tab remains plain `Velo`; compact status and separate notifications do not rewrite the macOS title bar.
+- Segment state-key caching removes repeated serialization while preserving correct invalidation. Package builds are deterministic, validated and documented in `docs/RELEASE_v1.2.0.md`.
+- Real validation uses macOS / After Effects 2026 (`26.5x89`) and isolated data. Windows receives static and package checks, not a Windows AE host certification.
+- TouchDesigner remains at v1.1.0; this AE release does not replace its TOX or history. A one-click cross-host installer is not included.
+
+### 中文
+
+- 新增本地 AE CEP 曲线编辑器，支持 Bezier、Elastic、Bounce、真实速度导数、多段保形编辑与自适应平滑。
+- 支持标量原生 Temporal Ease、多属性采样应用、EaseCopy、完整预设导入导出、主题与四语言界面。
+- 原生保存／取消使用系统文件窗口；非法预设文件不修改现有配置，剪贴板权限被拒绝时进入既有回退。
+- 原生标签保持纯 `Velo`，紧凑状态与独立通知不改写 macOS 标题栏。
+- 分段状态键缓存减少重复序列化并保持正确失效。构建可重复、经过校验，详见 `docs/RELEASE_v1.2.0.md`。
+- 在 macOS / After Effects 2026（`26.5x89`）使用隔离数据实测；Windows 仅做静态与打包检查，不宣称 Windows AE 宿主认证。
+- TouchDesigner 保持 v1.1.0，本 AE 版本不替换其 TOX 或历史，也不包含跨宿主一键安装器。
+
+
 ## 1.1.0 — 2026-10-21
 
 ### English

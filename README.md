@@ -1,77 +1,94 @@
 # Velo
 
-**Native TouchDesigner curve editor · 原生 TouchDesigner 曲线编辑器**
+[中文](README.zh-CN.md) · [After Effects guide](ae/README.md) · [Download v1.2.0](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.2.0)
 
-[中文文档](README_CN.md) · [English documentation](README_EN.md) · [Download / 下载](https://github.com/luoboruodai/velo-curve-editor/releases/latest)
+![Velo brand illustration — editable curves and true derivative views](docs/assets/velo-banner.svg)
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue) ![TouchDesigner](https://img.shields.io/badge/TouchDesigner-2025.31550-blue) ![macOS verified](https://img.shields.io/badge/macOS-verified-brightgreen) ![Windows package](https://img.shields.io/badge/Windows-package-blue) ![Tests](https://img.shields.io/badge/tests-69_passed-brightgreen)
+**Shape motion with direct curve, speed and keyframe control.** Velo is a local-first curve editor for After Effects, with Bezier, Elastic and Bounce models, multi-point editing, reusable presets and EaseCopy.
 
-![Velo main interface](docs/images/velo-main.png)
+## Get Velo 1.2.0 for After Effects
 
-## Overview / 简介
+1. Download **`VeloAE_v1.2.0_macOS_Windows.zip`** from the [v1.2.0 release](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.2.0). This is the installable panel attachment, not GitHub's automatic *Source code* archive.
+2. Check the ZIP against `VeloAE_v1.2.0_SHA256SUMS.txt` in the same release.
+3. Follow the [English offline guide](ae/packaging/README.en.md) or [中文安装指南](ae/packaging/README.md).
 
-Velo is a native COMP for editing **Bezier, Elastic and Bounce** curves in TouchDesigner. It combines multi-keyframe value editing, synchronized speed visualization, presets, EaseCopy, adaptive themes and native animation-keyframe export without WebRender, HTML or an external frontend runtime.
+No Node.js, Python, online account or additional extension is needed to use the panel. The Adobe CEP bridge is included locally.
 
-Velo 是原生 TD 曲线编辑组件，支持多关键帧、速度背景、预设、EaseCopy、主题切换和原生动画关键帧导出，无需浏览器或外部前端运行时。
+## A curve editor built around motion
 
-## Download / 下载
+| Area | What you can do |
+|---|---|
+| Curve models | Edit Bezier, Elastic and Bounce, reverse a curve, and inspect the true derivative rather than an unrelated decorative line. |
+| Multi-point editing | Insert points without changing the existing shape, drag anchors and handles, snap to continuous tangents, and switch between value and speed views. |
+| Controlled deletion | Choose ordinary deletion or shape-preserving deletion. Smooth suitable redundant points while retaining extrema, pauses and necessary negative speeds. |
+| After Effects output | Apply scalar native Temporal Ease or sampled arrays, Elastic/Bounce and multi-segment curves to consecutive numerical keyframes, with one undo group per application. |
+| EaseCopy | Copy easing or numerical values independently, preserve the target's other property, use passthrough where appropriate, and undo a paste as one action. |
+| Presets | Use 22 built-in presets, save user presets, reorder cards, hide built-ins, and export/import the complete configuration without overwriting existing user items. |
+| Interface | Four languages, four preset locations, compact mode, adjustable cards and grid, custom colors, reduced motion and concise status notifications. |
 
-- **Package / 发布包**: `Velo_v1.1.0_macOS_Windows.zip`
-- **Direct component / 直接组件**: [`dist/Velo.tox`](dist/Velo.tox)
-- **Evaluation copy / 评估副本**: `dist/Velo_Demo.tox`
-- **Host / 宿主**: TouchDesigner 2025.31550 or a compatible later version / 或兼容的更新版本
+The native AE tab stays simply **Velo**. The panel's short status remains next to the mode controls; longer feedback appears in a dismissible notification instead of squeezing the toolbar.
 
-The same native TOX is provided for macOS and Windows. **macOS is verified; Windows has not been runtime-tested in this environment.** / 同一原生 TOX 同时提供给 macOS 与 Windows；macOS 已验证，Windows 尚未在本环境实测。
+## Install in two steps
 
-## Install / 安装
+Quit AE, then copy `com.velo.curveeditor` from the extracted ZIP to your user CEP extensions folder:
 
-1. Download and unzip the release / 下载并解压发布包。
-2. Drag `Velo.tox` into your TouchDesigner network / 将 `Velo.tox` 拖入 TD 网络。
-3. Connect the first CHOP output to your downstream network / 将第一个 CHOP 输出接入下游。
+- **macOS:** `~/Library/Application Support/Adobe/CEP/extensions/`
+- **Windows:** `%APPDATA%\Adobe\CEP\extensions\`
 
-Output contract / 输出契约: one `fade` channel, 257 samples, endpoints `0 → 1` / 单通道 `fade`、257 个样本、首尾 `0→1`。
+Reopen AE and choose **Window → Extensions → Velo**. If your installation blocks unsigned CEP panels, see the offline guide for the scoped `PlayerDebugMode` setting; do not disable unrelated security protections.
 
-## Highlights / 特性
+Existing presets and settings remain on the local machine. Export important preset configurations before an upgrade.
 
-- Bezier / Elastic / Bounce curve models and synchronized speed display / 三类曲线与同步速度显示
-- Multi-keyframe editing and monotonic-safe flexible Bezier handles / 多关键帧与保持时间正向的自由拉杆
-- Native `animationCOMP` export with editable `fade` keyframes / 原生 `animationCOMP` 与可编辑 `fade` 关键帧导出
-- Preset browser, sorting, deletion, import/export / 预设浏览、排序、删除及导入导出
-- EaseCopy copy, integer-multiple paste, ease/value separation, passthrough preservation / EaseCopy 复制、整数倍粘贴、缓动／数值分离及直通保留
-- Adaptive accent themes, white handles and knobs, translucent glass view tools / 自适应主题、白色拉杆旋钮、半透明毛玻璃工具条
-- Native CHOP output for downstream TD networks / 原生 CHOP 输出供下游使用
+## Compatibility and honest validation
 
-## Write animation keyframes / 写入动画关键帧
+| Item | Status |
+|---|---|
+| Package | One portable CEP ZIP for macOS and Windows; no platform-specific binary. |
+| Manifest | AE `17.0` and later, CSXS `7.0`; declaration does not mean every version was exercised. |
+| macOS host checks | After Effects 2026, build `26.5x89`, using isolated test objects. |
+| Windows checks | Source, path, syntax and archive checks on Windows CI; **not a Windows AE host validation**. |
+| Other hosts | This release is for AE only. Cavalry and TouchDesigner are not installed by this package. |
 
-Open **Settings → Graph → 写入关键帧**. Velo creates a uniquely named `velo_animation[_NN]` Animation COMP inside the current component, with one `fade` channel and **258 linear keys at frames 0–257, including both endpoints**. Existing animation nodes are not overwritten.
+The release notes separate offline tests, CEP interaction, real AE writes, native file dialogs and unverified input/platform cases. A green CI run does not claim that AE is installed on the CI runners.
 
-打开 **设置 → 图形 → 写入关键帧**。Velo 会在当前组件内创建唯一命名的 `velo_animation[_NN]` Animation COMP，包含一个 `fade` 通道和 **0–257 帧共 258 个 `linear()` 关键帧（含首尾）**，不会覆盖已有动画节点。
+### Performance and size
 
-The native settings action, Animation COMP, channel and editable `keys` table were verified on macOS. Manual keyframe dragging inside Animation Editor is not separately claimed as tested. / 已验证原生设置按钮、Animation COMP、通道和可编辑 `keys` 表；不单独宣称已验收 Animation Editor 内的手动拖拽。
+Velo reuses sampled curves, thumbnails and unchanged state data. For a 12-segment microbenchmark, 28,000 repeated state-key reads no longer reserialize the segment array; scalar edits and segment replacement still invalidate the key. The measured key-path median decreased from about `2.46µs` to `0.92µs` on the recorded development machine. **This is not a claim of the same speedup for AE as a whole.**
 
-## Development / 开发
+The v1.2.0 package uses a small offline bilingual guide instead of the full historical development document. Readable source and the existing Adobe bridge are retained; no minifier or runtime dependency is added just to make the archive look smaller.
 
-- `src/python/`: curve model, handle math, native layout, dialogs, EaseCopy and keyframe export / 曲线模型、手柄数学、原生布局、弹层、EaseCopy 与关键帧导出
-- `src/curve_editor.tox.dir/`: editable expanded native component / 可编辑展开组件
-- `tools/`: UI generator, TOX build and regression tests / UI 生成器、TOX 构建与回归测试
+## TouchDesigner — native v1.1.0
 
-Run tests / 运行测试：
+[中文 TD 文档](README_CN.md) · [English TD documentation](README_EN.md) · [TD v1.1.0 download](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.1.0) · [TD verification](docs/VERIFICATION.md)
+
+The existing TouchDesigner product remains a **native COMP**, not a CEP panel. It uses native Panel, Text, Button, Script CHOP, Script SOP, Geometry and Render TOP nodes, without WebRender, HTML or an external frontend runtime. Its first output remains one `fade` CHOP channel with **257 samples and endpoints `0 → 1`**.
+
+Features include multi-keyframe value editing, synchronized speed, presets, EaseCopy, adaptive themes and opt-in native Animation COMP export with **258 linear keys at frames 0–257**. Download `Velo_v1.1.0_macOS_Windows.zip` from the versioned TD release, drag `Velo.tox` into your network and connect the first CHOP output. macOS / TD 2025.31550 is verified; Windows is not runtime-verified in the recorded environment.
+
+This AE release does not replace the TD source, TOX, documentation or release history. A one-click installer for AE, Cavalry and TouchDesigner is a later task, **not a feature of either current package**. Do not install the AE panel into TD or Cavalry and expect it to work.
+
+## Develop and verify
+
+The panel is dependency-free at runtime. From the repository root:
 
 ```bash
-for test in tools/test_*.py; do python3 "$test"; done
+for file in ae/tools/test_*.js; do node "$file"; done
+python3 ae/tools/test_panel_structure.py
+python3 ae/tools/test_theme_tokens.py
+python3 ae/tools/test_td_parity.py
+python3 ae/tools/test_release.py
+python3 ae/tools/build_release.py
 ```
 
-Build / 构建：
+`build_release.py` requires reviewed, committed release sources, checks both manifest versions and the host version, validates offline links and ZIP contents, and writes the archive, per-file manifest and SHA-256 file. A failed candidate does not replace the previous valid ZIP.
 
-```bash
-bash tools/build_tox.sh
-```
+The [validation workflow](.github/workflows/ae-validation.yml) runs the offline checks on macOS, Windows and Ubuntu. Tagged builds additionally create a validation artifact; publishing the release remains an explicit action.
 
-## Documentation / 文档
+## Privacy, notices and contributions
 
-- [中文说明](README_CN.md)
-- [English documentation](README_EN.md)
-- [Changelog / 更新日志](CHANGELOG.md)
-- [Verification / 验证](docs/VERIFICATION.md)
-- [Release announcement / 发布文案](docs/ANNOUNCEMENT.md)
-- [Agent handoff / Agent 交接](AGENTS.md) and [project context / 项目上下文](PROJECT_CONTEXT.md)
+- Curve editing and preset storage are local. Velo does not require an analytics or activation service.
+- The Adobe bridge retains its original notices in `js/CSInterface.js`; see [third-party notices](ae/packaging/THIRD_PARTY_NOTICES.md).
+- The banner is an original illustration, not a screenshot of a user's project.
+- [Issues](https://github.com/luoboruodai/velo-curve-editor/issues) with the AE version/build, OS, reproduction steps and an isolated example are welcome. Do not upload private projects or credentials.
+
+[Release notes](docs/RELEASE_v1.2.0.md) · [中文说明](README.zh-CN.md) · [TouchDesigner history](https://github.com/luoboruodai/velo-curve-editor/releases)

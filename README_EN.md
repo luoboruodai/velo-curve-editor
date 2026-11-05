@@ -37,7 +37,7 @@ Velo is a native TouchDesigner COMP for **Bezier, Elastic and Bounce** curve edi
 
 ## Installation
 
-1. Download `Velo_v1.1.0_macOS_Windows.zip` from [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/latest).
+1. Download `Velo_v1.1.0_macOS_Windows.zip` from [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.1.0).
 2. Unzip it and drag `Velo.tox` into your TouchDesigner network.
 3. Connect the first CHOP output to the downstream node that needs the fade signal.
 

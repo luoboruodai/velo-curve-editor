@@ -22,6 +22,16 @@ Start with `PROJECT_CONTEXT.md`, then read only the modules needed for the curre
 - `tools/generate_ui.py`: managed native-node generation and manifest registration.
 - `tools/build_tox.sh`: Python-to-DAT synchronization and TOX build.
 
+## After Effects source map
+
+- `ae/VeloAE/`: the local CEP panel, shared JavaScript curve model, interface, themes and ExtendScript host bridge. This is a separate AE product; the TD prohibition on HTML/WebRender does not prohibit the AE panel's own CEP architecture.
+- `ae/VeloAE/js/curve-model.js`: the shared curve, multi-segment, derivative and smoothing mathematics used by display, presets, JSON and AE output.
+- `ae/VeloAE/js/main.js`: CEP interaction, preset management, rendering and panel state. `ae/VeloAE/jsx/hostscript.jsx`: actual AE inspection, application, EaseCopy and native preset export.
+- `ae/tools/`: offline model, interface, i18n, preset-transfer and release-package checks. `ae/tools/build_release.py` builds only from a reviewed, committed source state.
+- `ae/packaging/`: concise offline bilingual installation guides. `docs/RELEASE_v1.2.0.md`: version-specific verification and platform boundaries.
+
+AE's native tab remains plain `Velo`. Keep both manifest versions and `hostscript.jsx`'s `VERSION` synchronized. CEP uses pointer-based preset dragging while the browser preview retains HTML5 drag-and-drop; both share `reorderPreset()`. Segment-key caching is based on the segment array reference, with scalar values always read afresh. Do not convert CEP CSS viewport checks into native-window or Windows-host claims.
+
 ## Change rules
 
 1. Keep one mathematical source for display, editing, copy, export and CHOP output.

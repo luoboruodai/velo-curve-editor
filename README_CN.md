@@ -37,7 +37,7 @@ Velo 是原生 TD COMP，用于编辑 **Bezier、Elastic 和 Bounce** 曲线。�
 
 ## 安装
 
-1. 从 [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/latest) 下载 `Velo_v1.1.0_macOS_Windows.zip`。
+1. 从 [Releases](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.1.0) 下载 `Velo_v1.1.0_macOS_Windows.zip`。
 2. 解压后将 `Velo.tox` 拖入 TouchDesigner 网络。
 3. 将第一个 CHOP 输出接入需要渐暗信号的下游节点。
 

@@ -1,5 +1,18 @@
 # Verification / 验证说明
 
+## After Effects 1.2.0 / AE 曲线编辑器
+
+- The AE manifest and host engine are version **1.2.0**. The installable attachment is `VeloAE_v1.2.0_macOS_Windows.zip`; its digest is provided separately as `VeloAE_v1.2.0_SHA256SUMS.txt`.
+- **947 offline regression and package checks pass**, including 234 panel-structure, 388 i18n and 15 release-package checks. The CI matrix runs these checks on macOS, Windows and Ubuntu without installing AE.
+- Real macOS / After Effects 2026 (`26.5x89`) checks cover 13 host groups, 46 preset/settings groups and 15 curve/preview groups. Native save/cancel, complete and legacy imports, invalid-file protection and original-state restoration also pass.
+- Segment state-key caching preserves identical keys and checksums while eliminating repeated segment serialization after warmup in the 28,000-read microbenchmark. Its measured median key-path timing changed from approximately `2.46µs` to `0.92µs`; this does not represent the whole AE application.
+- A real CEP preview check with the same 12-segment curve recorded 90 segment serializations before caching and 0 afterward, with 62 and 65 preview clears respectively and identical curve bytes. This is not a whole-application frame-rate claim.
+- CEP pointer preset dragging verified target highlighting, visible and persisted order, ordinary click behavior and no reorder on outside release. Native HTML5 `dragover/drop` did not complete and is not claimed as passing. Evidence distinguishes CEP input from unverified physical input paths.
+- The package uses explicit members, portable paths, offline bilingual guides and a candidate-then-replace build. Rebuilding identical reviewed inputs produces identical bytes; failed candidates do not replace the previous valid archive.
+- **Windows receives structural, path, syntax and archive checks, not a Windows AE runtime certification.** Native CEP behavior and macOS host evidence are not interchangeable with Windows verification. See `docs/RELEASE_v1.2.0.md` for the detailed scope and remaining input boundaries.
+- TD remains a separate product at version **1.1.0**. Its native TOX, output contract and verification below are unchanged by the AE release.
+
+
 ## Artifact identity / 产物身份
 
 - Version / 版本: **1.1.0**

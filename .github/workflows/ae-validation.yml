@@ -1,0 +1,86 @@
+name: Velo AE validation
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: Offline checks on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: JavaScript syntax
+        shell: bash
+        run: node --check ae/VeloAE/js/main.js
+      - name: JavaScript regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in ae/tools/test_*.js; do
+            node "$file"
+          done
+      - name: Python regression and package tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in ae/tools/test_panel_structure.py ae/tools/test_theme_tokens.py ae/tools/test_td_parity.py ae/tools/test_release.py; do
+            python3 "$file"
+          done
+
+  package:
+    name: Validate tagged portable package
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: offline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build from the reviewed commit
+        run: python3 ae/tools/build_release.py
+      - name: Check the installable ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import zipfile
+          from pathlib import Path
+          version = '1.2.0'
+          archive = Path(f'dist/VeloAE_v{version}_macOS_Windows.zip')
+          checksum = Path(f'dist/VeloAE_v{version}_SHA256SUMS.txt').read_text(encoding='utf-8').split()[0]
+          assert archive.is_file()
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == checksum
+          with zipfile.ZipFile(archive) as bundle:
+              assert bundle.testzip() is None
+              assert 'com.velo.curveeditor/index.html' in bundle.namelist()
+              assert not any(name.endswith('.debug') for name in bundle.namelist())
+          print(f'{archive.name}: {archive.stat().st_size} bytes, SHA-256 {checksum}')
+          PY
+      - name: Upload validation artifact, not a GitHub Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: VeloAE-${{ github.ref_name }}-portable-validation
+          path: |
+            dist/VeloAE_v1.2.0_macOS_Windows.zip
+            dist/VeloAE_v1.2.0_macOS_Windows.manifest.json
+            dist/VeloAE_v1.2.0_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14

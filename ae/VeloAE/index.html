@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="appContainer" class="app-container preset-right" data-language="zh-CN">
+    <main class="main-content">
+      <div class="container">
+        <header class="header">
+          <div id="status" class="status header-status" role="status" aria-live="polite"><span id="healthDot" class="health-dot" data-state="ready" aria-hidden="true"></span><span id="statusText">就绪</span></div>
+          <div class="mode-group" role="group" aria-label="曲线模式" data-i18n-aria-label="group.curveModes">
+            <button class="mode-btn active" data-mode="bezier" title="Bezier">Bezier</button>
+            <button class="mode-btn" data-mode="elastic" title="Elastic">Elastic</button>
+            <button class="mode-btn" data-mode="bounce" title="Bounce">Bounce</button>
+          </div>
+          <div id="viewGroup" class="view-group" role="group" aria-label="编辑视图" data-i18n-aria-label="group.editView">
+            <button class="view-btn active" data-view="value" title="编辑值曲线" data-i18n-title="view.valueTitle">值</button>
+            <button class="view-btn" data-view="speed" title="编辑速度曲线" data-i18n-title="view.speedTitle">速</button>
+          </div>
+          <button id="directionBtn" class="direction-btn" title="切换 In / Out / In Out" data-i18n-title="direction.toggleTitle">Out</button>
+          <button id="settingsBtn" class="settings-btn" title="设置" aria-label="设置" data-i18n-title="settings.open" data-i18n-aria-label="settings.open"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 2h4l.6 2 1.6.9 2-.5 2 3.4-1.5 1.4v2l1.5 1.4-2 3.4-2-.5-1.6.9-.6 2H8l-.6-2-1.6-.9-2 .5-2-3.4L3.3 11V9L1.8 7.6l2-3.4 2 .5L7.4 4 8 2Z"/><circle cx="10" cy="10" r="2.5"/></svg></button>
+        </header>
+
+        <div id="canvasWrapper" class="canvas-wrapper">
+          <canvas id="curveCanvas" role="img" aria-label="值曲线和背景速度曲线" data-i18n-aria-label="canvas.aria"></canvas>
+          <canvas id="previewCanvas" aria-hidden="true"></canvas>
+          <div class="preview-transport" aria-label="曲线预览" data-i18n-aria-label="preview.group" hidden>
+            <button id="previewPlayBtn" title="暂停预览" aria-label="暂停预览"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg></button>
+            <label><span data-i18n="preview.duration">时长</span> <input id="previewDuration" type="number" min="0.1" max="60" step="0.1" value="2.0" aria-label="预览时长（秒）" data-i18n-aria-label="preview.durationAria">s</label>
+          </div>
+          <span id="speedInfo" class="speed-info" data-i18n="speed.info" hidden>速度</span>
+          <span id="tangentSnapHint" class="anchor-snap-hint" data-i18n="status.tangentSnap" hidden>连续切线</span>
+        </div>
+
+        <section id="paramsContainer">
+          <div id="bezierDataPanel" class="param-group">
+            <div class="json-export-group">
+              <input id="bezierJsonOutput" type="text" readonly title="当前曲线 JSON" aria-label="当前曲线 JSON" data-i18n-title="curve.json" data-i18n-aria-label="curve.json">
+              <button id="copyJsonBtn" title="复制曲线 JSON" data-i18n="action.copyJsonShort" data-i18n-title="curve.copyJson">Copy</button>
+            </div>
+          </div>
+          <div id="elasticParamsPanel" class="param-group slider-only" hidden>
+            <label><span data-i18n="param.amplitude">幅度</span> <output id="ampValue">0.50</output><input id="ampSlider" type="range" min="0" max="100" value="50" title="幅度" aria-label="幅度" data-i18n-title="param.amplitude" data-i18n-aria-label="param.amplitude"></label>
+            <label><span data-i18n="param.frequency">频率</span> <output id="freqValue">2.00</output><input id="freqSlider" type="range" min="50" max="1000" value="200" title="频率" aria-label="频率" data-i18n-title="param.frequency" data-i18n-aria-label="param.frequency"></label>
+          </div>
+          <div id="bounceParamsPanel" class="param-group slider-only" hidden>
+            <label><span data-i18n="param.restitution">恢复系数</span> <output id="corValue">0.50</output><input id="corSlider" type="range" min="0" max="100" value="50" title="恢复系数" aria-label="恢复系数" data-i18n-title="param.restitution" data-i18n-aria-label="param.restitution"></label>
+            <label><span data-i18n="param.period">周期</span> <output id="periodValue">0.50</output><input id="periodSlider" type="range" min="0" max="200" value="50" title="周期" aria-label="周期" data-i18n-title="param.period" data-i18n-aria-label="param.period"></label>
+          </div>
+        </section>
+
+        <div class="actions">
+          <div class="action-btn-group">
+            <button id="pasteBtn" class="action-btn" title="粘贴曲线" data-i18n="action.paste" data-i18n-title="action.pasteTitle">粘贴</button>
+            <button id="resetBtn" class="action-btn" title="重置当前模式" data-i18n="action.reset" data-i18n-title="action.resetTitle">重置</button>
+            <button id="reverseBtn" class="action-btn" title="反向曲线" data-i18n="action.reverse" data-i18n-title="action.reverseTitle">反向</button>
+            <button id="smoothAllBtn" class="action-btn" title="整体平滑关键帧切线并简化冗余点位" data-i18n="action.smoothAll" data-i18n-title="action.smoothAllTitle">平滑</button>
+            <button id="savePresetBtn" class="action-btn" title="保存用户预设" data-i18n="action.save" data-i18n-title="action.saveTitle">保存</button>
+          </div>
+          <div class="host-actions">
+            <button id="inspectBtn" class="secondary-btn" title="检查 AE 目标" data-i18n="action.inspect" data-i18n-title="action.inspectTitle">检查目标</button>
+            <button id="applyBtn" title="将当前曲线应用到 AE 选中的关键帧" data-i18n-title="action.applyTitle">Apply</button>
+          </div>
+          <section class="easecopy-group" aria-label="EaseCopy 关键帧工具" data-i18n-aria-label="ease.group">
+            <header><strong>EaseCopy</strong><span id="easeCopyCount">0 个关键帧</span></header>
+            <div class="easecopy-actions">
+              <button id="easeCopyCopyBtn" title="复制选中的 AE 关键帧" data-i18n="ease.copy" data-i18n-title="ease.copyTitle">复制</button>
+              <button id="easeCopyEaseBtn" title="只粘贴缓动，保留数值" data-i18n="ease.pasteEase" data-i18n-title="ease.pasteEaseTitle">粘贴缓动</button>
+              <button id="easeCopyValueBtn" title="只粘贴数值，保留缓动" data-i18n="ease.pasteValue" data-i18n-title="ease.pasteValueTitle">粘贴数值</button>
+              <button id="easeCopyPassBtn" aria-pressed="false" title="保留左右速度连续的内部关键帧" data-i18n="ease.pass" data-i18n-title="ease.passTitle">直通</button>
+              <button id="easeCopyClearBtn" title="清空复制缓冲区，不修改 AE" data-i18n="ease.clear" data-i18n-title="ease.clearTitle">清空</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <div id="panelResizer" class="panel-resizer" title="拖动调整预设区域" data-i18n-title="preset.resize"></div>
+    <aside id="presetPanel" class="preset-panel" aria-label="曲线预设" data-i18n-aria-label="preset.panel">
+      <div id="presetList" class="preset-list"></div>
+    </aside>
+  </div>
+
+  <div id="presetContextMenu" class="context-menu" hidden>
+    <button id="presetHideBtn" data-i18n="preset.hide">隐藏内置预设</button>
+    <button id="presetDeleteBtn" data-i18n="preset.delete">删除用户预设</button>
+  </div>
+
+  <div id="anchorContextMenu" class="context-menu anchor-context-menu" role="menu" hidden>
+    <button id="anchorSmoothBtn" role="menuitem" data-i18n="anchor.smooth">平滑点位</button>
+    <button id="anchorPreserveDeleteBtn" role="menuitem" data-i18n="anchor.preserveDelete">保形删除</button>
+    <button id="anchorDeleteBtn" class="danger-item" role="menuitem" data-i18n="anchor.delete">删除点位</button>
+  </div>
+
+  <div id="settingsModal" class="modal-backdrop" role="dialog" hidden aria-modal="true" aria-labelledby="settingsTitle">
+    <section class="settings-panel">
+      <header class="settings-header">
+        <h3 id="settingsTitle" data-i18n="settings.open">设置</h3>
+        <button id="closeSettingsBtn" class="close-btn" title="关闭设置" aria-label="关闭" data-i18n-title="settings.close" data-i18n-aria-label="settings.closeAria">×</button>
+      </header>
+      <nav class="settings-tabs" aria-label="设置分类" data-i18n-aria-label="settings.categories">
+        <button class="settings-tab active" data-settings-page="interface" data-i18n="settings.interface">界面</button>
+        <button class="settings-tab" data-settings-page="presets" data-i18n="settings.presets">预设</button>
+        <button class="settings-tab" data-settings-page="theme" data-i18n="settings.theme">主题</button>
+        <button class="settings-tab" data-settings-page="graph" data-i18n="settings.graph">图形</button>
+      </nav>
+      <div class="settings-content">
+        <section class="settings-page" data-page="interface">
+          <h4 data-i18n="settings.interfaceTitle">界面设置</h4>
+          <fieldset><legend data-i18n="settings.layout">布局</legend>
+            <label class="setting-row" for="languageSelect"><span data-i18n="settings.language">语言</span>
+              <select id="languageSelect"><option value="zh-CN">中文</option><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option></select>
+            </label>
+            <label class="setting-row" for="presetLocation"><span data-i18n="settings.presetLocation">预设位置</span>
+              <select id="presetLocation"><option value="right" data-i18n="location.right">右侧</option><option value="left" data-i18n="location.left">左侧</option><option value="top" data-i18n="location.top">顶部</option><option value="bottom" data-i18n="location.bottom">底部</option></select>
+            </label>
+          </fieldset>
+          <fieldset><legend data-i18n="settings.interaction">交互</legend>
+            <label class="setting-row" for="compactToggle"><span data-i18n="settings.compact">紧凑模式</span>
+              <span class="switch"><input id="compactToggle" type="checkbox"><span class="switch-track"></span></span>
+            </label>
+            <label class="setting-row" for="motionToggle"><span data-i18n="settings.reduceMotion">减少动效</span>
+              <span class="switch"><input id="motionToggle" type="checkbox"><span class="switch-track"></span></span>
+            </label>
+            <label class="setting-row" for="autoApplyPreset"><span data-i18n="settings.autoInspect">Apply 前检查目标</span>
+              <span class="switch"><input id="autoApplyPreset" type="checkbox" checked><span class="switch-track"></span></span>
+            </label>
+          </fieldset>
+        </section>
+        <section class="settings-page" data-page="presets" hidden>
+          <h4 data-i18n="settings.presetManagement">预设管理</h4>
+          <fieldset><legend data-i18n="settings.presetCards">预设卡</legend>
+            <p class="settings-hint" data-i18n="settings.presetHint">拖拽排序 · 右键删除 / 导出</p>
+            <label class="setting-row" for="presetSize"><span data-i18n="settings.cardSize">卡片大小</span> <span class="setting-slider"><input id="presetSize" type="range" min="40" max="104" value="80"><output id="presetSizeValue">80</output></span></label>
+          </fieldset>
+          <fieldset><legend data-i18n="settings.files">文件</legend>
+            <div class="settings-button-row"><button id="importPresetsBtn" class="secondary-btn" data-i18n="settings.import">导入曲线预设</button><button id="exportPresetsBtn" class="secondary-btn" data-i18n="settings.export">导出曲线预设</button></div>
+            <input id="presetFileInput" type="file" accept=".json" hidden>
+            <output id="presetExportPath" class="settings-export-path" aria-live="polite" hidden></output>
+            <button id="restorePresetsBtn" class="secondary-btn full-width" data-i18n="settings.restoreHidden">恢复隐藏预设</button>
+          </fieldset>
+        </section>
+        <section class="settings-page" data-page="theme" hidden>
+          <h4 data-i18n="settings.themeTitle">主题设置</h4>
+          <fieldset><legend data-i18n="settings.colors">颜色</legend>
+            <label class="setting-row" for="themeColor"><span data-i18n="settings.curveColor">曲线颜色</span> <input id="themeColor" type="color" value="#4a90e2"></label>
+            <label class="setting-row" for="themeBackground"><span data-i18n="settings.canvasBackground">画布背景</span> <input id="themeBackground" type="color" value="#222222"></label>
+            <label class="setting-row" for="themeHandles"><span data-i18n="settings.handleColor">控制点颜色</span> <input id="themeHandles" type="color" value="#dcdcdc"></label>
+          </fieldset>
+          <fieldset><legend data-i18n="settings.quickThemes">快捷主题</legend>
+            <div class="settings-button-row"><button class="secondary-btn theme-choice" data-color="#4a90e2" data-i18n="theme.blue">蓝色</button><button class="secondary-btn theme-choice" data-color="#39c5cf" data-i18n="theme.cyan">青色</button><button class="secondary-btn theme-choice" data-color="#f2b35d" data-i18n="theme.amber">琥珀</button></div>
+          </fieldset>
+        </section>
+        <section class="settings-page" data-page="graph" hidden>
+          <h4 data-i18n="settings.graphTitle">图形设置</h4>
+          <fieldset><legend data-i18n="settings.grid">网格</legend>
+            <label class="setting-row"><span data-i18n="settings.gridXY">网格 X / Y</span> <span class="grid-inputs"><input id="gridX" type="number" min="1" max="20" value="4" aria-label="网格 X" data-i18n-aria-label="settings.gridX"><input id="gridY" type="number" min="1" max="20" value="4" aria-label="网格 Y" data-i18n-aria-label="settings.gridY"></span></label>
+          </fieldset>
+          <fieldset><legend data-i18n="settings.curve">曲线</legend>
+            <label class="setting-row" for="curvePrecision"><span data-i18n="settings.precision">曲线精度</span> <span class="setting-slider"><input id="curvePrecision" type="range" min="50" max="1000" step="10" value="300"><output id="curvePrecisionValue">300</output></span></label>
+            <label class="setting-row" for="speedToggle"><span data-i18n="settings.speedBackground">贝塞尔速度背景</span>
+              <span class="switch"><input id="speedToggle" type="checkbox" checked><span class="switch-track"></span></span>
+            </label>
+            <label class="setting-row" for="speedStrength"><span data-i18n="settings.backgroundStrength">背景强度</span> <span class="setting-slider"><input id="speedStrength" type="range" min="5" max="65" value="28"><output id="speedStrengthValue">28%</output></span></label>
+            <button id="fitCurveBtn" class="secondary-btn full-width" data-i18n="settings.fitCurve">适配当前曲线</button>
+          </fieldset>
+        </section>
+      </div>
+      <footer class="settings-footer"><button id="resetDefaultsBtn" class="secondary-btn" data-i18n="settings.restoreDefaults">恢复默认</button><button id="doneSettingsBtn" class="secondary-btn primary-btn" data-i18n="settings.done">完成</button></footer>
+    </section>
+  </div>
+
+  <div id="colorPickerModal" class="modal-backdrop color-picker-backdrop" role="dialog" hidden aria-modal="true" aria-labelledby="colorPickerTitle">
+    <section class="color-picker-panel">
+      <header class="settings-header"><h3 id="colorPickerTitle" data-i18n="color.title">调整颜色</h3><button id="colorPickerClose" class="close-btn" type="button" title="关闭颜色调整" aria-label="关闭颜色调整" data-i18n-title="color.close" data-i18n-aria-label="color.close">×</button></header>
+      <div class="color-picker-content">
+        <canvas id="colorField" width="280" height="150" aria-label="饱和度和亮度" data-i18n-aria-label="color.field"></canvas>
+        <label class="color-hue-row"><span data-i18n="color.hue">色相</span><input id="colorHue" type="range" min="0" max="360" step="1" value="0"></label>
+        <div class="color-swatches" aria-label="快捷颜色" data-i18n-aria-label="color.swatches">
+          <button type="button" data-color="#4a90e2" style="background:#4a90e2" title="蓝色" aria-label="蓝色" data-i18n-title="theme.blue" data-i18n-aria-label="theme.blue"></button>
+          <button type="button" data-color="#39c5cf" style="background:#39c5cf" title="青色" aria-label="青色" data-i18n-title="theme.cyan" data-i18n-aria-label="theme.cyan"></button>
+          <button type="button" data-color="#f2b35d" style="background:#f2b35d" title="琥珀" aria-label="琥珀" data-i18n-title="theme.amber" data-i18n-aria-label="theme.amber"></button>
+          <button type="button" data-color="#e06363" style="background:#e06363" title="红色" aria-label="红色" data-i18n-title="color.red" data-i18n-aria-label="color.red"></button>
+          <button type="button" data-color="#72b878" style="background:#72b878" title="绿色" aria-label="绿色" data-i18n-title="color.green" data-i18n-aria-label="color.green"></button>
+          <button type="button" data-color="#a78bda" style="background:#a78bda" title="紫色" aria-label="紫色" data-i18n-title="color.purple" data-i18n-aria-label="color.purple"></button>
+        </div>
+        <div class="color-values">
+          <label class="color-hex-field"><span>Hex</span><input id="colorHex" type="text" maxlength="7" value="#4a90e2" spellcheck="false"></label>
+          <label><span>R</span><input id="colorR" type="number" min="0" max="255" step="1" value="74"></label>
+          <label><span>G</span><input id="colorG" type="number" min="0" max="255" step="1" value="144"></label>
+          <label><span>B</span><input id="colorB" type="number" min="0" max="255" step="1" value="226"></label>
+        </div>
+        <div class="color-preview-row"><span id="colorPreview" class="color-preview" aria-hidden="true"></span><output id="colorError" class="color-error" data-i18n="color.invalid" hidden>颜色格式无效</output></div>
+      </div>
+      <footer class="settings-footer"><button id="colorPickerCancel" class="secondary-btn" type="button" data-i18n="color.cancel">取消</button><button id="colorPickerApply" class="secondary-btn primary-btn" type="button" data-i18n="color.apply">应用</button></footer>
+    </section>
+  </div>
+
+  <div id="multiPointModal" class="modal-backdrop multi-point-backdrop" role="dialog" hidden aria-modal="true" aria-labelledby="multiPointTitle">
+    <section class="multi-point-panel">
+      <header class="settings-header"><h3 id="multiPointTitle" data-i18n="dialog.multiPointTitle">多点位编辑</h3><button id="multiPointClose" class="close-btn" type="button" title="关闭多点位提示" aria-label="关闭多点位提示" data-i18n-title="dialog.close" data-i18n-aria-label="dialog.close">×</button></header>
+      <p id="multiPointMessage" class="multi-point-message">多点位仅支持 Bezier，不适用于 Elastic 或 Bounce。切换到 Bezier 值视图后可继续。</p>
+      <footer class="settings-footer"><button id="multiPointCancel" class="secondary-btn" type="button" data-i18n="dialog.cancel">取消</button><button id="multiPointSwitch" class="secondary-btn primary-btn" type="button" data-i18n="dialog.switchToValue">切换到值视图</button></footer>
+    </section>
+  </div>
+
+  <div id="statusToast" class="status-toast" role="status" aria-live="polite" data-state="ready" hidden>
+    <span id="toastDot" class="toast-dot" aria-hidden="true"></span>
+    <span id="toastText" class="toast-message"></span>
+    <button id="toastClose" class="toast-close" type="button" title="关闭通知" aria-label="关闭通知" data-i18n-title="toast.close" data-i18n-aria-label="toast.close">×</button>
+  </div>
+
+  <script src="js/CSInterface.js"></script>
+  <script src="js/curve-model.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

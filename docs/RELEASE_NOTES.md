@@ -1,3 +1,18 @@
+# Velo 1.2.0 for After Effects
+
+The AE release provides a local CEP panel for Bezier, Elastic and Bounce, multi-point editing, true speed derivatives, EaseCopy, full preset configuration transfer and four interface languages.
+
+AE 版本提供本地 CEP 曲线编辑面板，支持多点位、真实速度导数、EaseCopy、完整预设配置与四语言界面。
+
+- Installable package / 安装附件: `VeloAE_v1.2.0_macOS_Windows.zip`
+- SHA-256 / 校验文件: `VeloAE_v1.2.0_SHA256SUMS.txt`
+- Offline bilingual guides are included in the ZIP / ZIP 内含离线双语安装指南。
+- macOS validation uses After Effects 2026 (`26.5x89`) / macOS 使用 AE 2026（`26.5x89`）验收。
+- Windows receives static and archive checks only, not a Windows AE runtime claim / Windows 仅做静态与归档检查，不宣称宿主实测。
+- Read [AE v1.2.0 release and verification notes](RELEASE_v1.2.0.md) for the complete scope / 完整范围见 AE 版本说明。
+
+TouchDesigner remains a separate v1.1.0 product. The following TD release notes and its versioned download are preserved. / TD 保持独立的 v1.1.0 产品，以下 TD 发布说明和版本化下载入口继续保留。
+
 # Velo 1.1.0
 
 Native TouchDesigner curve editing with live CHOP output and opt-in Animation COMP keyframe authoring.
