@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
@@ -27,7 +28,7 @@ class AssetTests(unittest.TestCase):
             linked.parent.mkdir()
             linked.symlink_to('../Resources/payload', target_is_directory=True)
             with patch.object(sys, '_MEIPASS', str(linked.parent), create=True):
-                self.assertEqual(resource_path('payload'), payload.resolve())
+                self.assertTrue(os.path.samefile(resource_path('payload'), payload))
                 self.assertEqual(resource_path('payload').is_symlink(), False)
             other = base / 'Contents' / 'Elsewhere' / 'other'
             other.parent.mkdir(parents=True)
