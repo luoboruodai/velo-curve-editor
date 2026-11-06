@@ -26,7 +26,7 @@
 |---|---|
 | AE 离线回归与打包检查 | 1,015 项通过 |
 | TouchDesigner 离线检查 | 69 项通过，TD 版本及历史保持不变 |
-| 安装器事务、资源与布局测试 | 22 项通过，覆盖首次安装、升级、篡改拒绝、失败回滚、恢复、链接边界、冻结资源、备份信息布局和平台版本输入 |
+| 安装器事务、资源与布局测试 | 23 项通过，覆盖首次安装、升级、篡改拒绝、失败回滚、恢复、链接边界、冻结资源、备份信息布局、平台版本输入和 ICO 目录／PNG 帧边界 |
 | 真实 AE / macOS 2026（`26.5x89`） | 11 组原生曲线检查通过，运行错误为 0；测试合成及原设置已恢复 |
 | 原生安装器 CLI | 内嵌面板安装、版本、备份和恢复验证；最终应用 ZIP 的文件、目录链接、权限、bundle 版本和签名已回读 |
 | 原生安装器 / macOS | 两次键盘安装、真实目录选择恢复及备份哈希核对通过；中英文 Tk 布局与 620×640 滚动可达性通过 |
@@ -68,7 +68,7 @@
 ### Validation
 
 - **1,015** AE offline/package checks and **69** TD checks pass.
-- **22** installer transaction/resource/layout checks pass, including install, upgrade, tamper rejection, rollback, restore, bounded backup-path presentation, platform version inputs, link boundaries and frozen resources.
+- **23** installer transaction/resource/layout checks pass, including install, upgrade, tamper rejection, rollback, restore, bounded backup-path presentation, platform version inputs, ICO directory/PNG frame boundaries, link boundaries and frozen resources.
 - **11** real macOS / AE 2026 (`26.5x89`) native-curve checks pass with no runtime errors; test compositions and original settings are restored.
 - Native installer CLI checks cover the embedded panel, version, backup and restore. The final macOS ZIP is checked for bytes, directory links, permissions, bundle version and signature.
 - Native macOS keyboard installation, repeated-upgrade backup and directory-picker restore pass with complete backup hashes. Chinese and English Tk layouts have actual screenshots and measured content fitting plus `620×640` scrolling; these synthetic layout fixtures do not certify a physical language-button click.

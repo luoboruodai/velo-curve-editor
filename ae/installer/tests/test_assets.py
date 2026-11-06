@@ -19,6 +19,21 @@ class AssetTests(unittest.TestCase):
         manifest = verify_assets()
         self.assertGreaterEqual(len(manifest['files']), 11)
 
+    def test_ico_directory_precedes_complete_png_frames(self):
+        import struct
+        from ae.installer.icons import make_ico
+        images = {size: (Path(__file__).parents[1] / 'assets' / f'icon{size}.png').read_bytes() for size in (16, 24, 256)}
+        ico = make_ico(images)
+        expected_offset = 6 + 16 * len(images)
+        for index, (size, data) in enumerate(images.items()):
+            width, height, _, _, _, _, length, offset = struct.unpack_from('<BBBBHHII', ico, 6 + index * 16)
+            self.assertEqual((width or 256, height or 256), (size, size))
+            self.assertEqual(length, len(data))
+            self.assertEqual(offset, expected_offset)
+            self.assertEqual(ico[offset:offset + length], data)
+            expected_offset += length
+        self.assertEqual(expected_offset, len(ico))
+
     def test_standard_pyinstaller_payload_link_is_accepted_only_exactly(self):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary)

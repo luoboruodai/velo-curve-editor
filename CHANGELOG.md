@@ -6,14 +6,14 @@
 
 - Added a separate **Read** action for selected AE keyframes, restoring times, values and native tangents without replacing the editor during a read-only inspection.
 - Multi-anchor Bezier now writes native keyframes and Temporal Ease for scalars and compatible arrays, replacing redundant selected anchors rather than baking the whole curve. Shape-preserving hidden knots and linked spatial negative speeds use explicitly reported local sampling fallbacks.
-- Added the offline Velo installer for AE on macOS and Windows, with embedded payload verification, complete backups, rollback on failure and restore support. Platform version metadata is synchronized, and compact backup details use a height-adaptive, scrollable layout. Cavalry and TouchDesigner installers remain future work.
+- Added the offline Velo installer for AE on macOS and Windows, with embedded payload verification, complete backups, rollback on failure and restore support. Platform version metadata is synchronized, compact backup details use a height-adaptive, scrollable layout, and the Windows ICO uses validated directory entries and complete PNG frames. Cavalry and TouchDesigner installers remain future work.
 - Added 1,015 AE offline checks, 69 TD checks and installer-specific tests. Real macOS / AE 2026 validation covers 11 native-curve cases. Windows native build and CLI validation are separate from a Windows AE host test.
 
 ### 中文
 
 - 新增独立“读取曲线”动作，读取 AE 选中关键帧的时间、数值和原生切线；“检查目标”继续只检查选区，不覆盖编辑器。
 - 多点位 Bezier 为标量和兼容数组写入原生关键帧及 Temporal Ease，并替换选区内的冗余锚点，不再默认把整段曲线烘焙成采样点。保形隐藏节点与共享空间属性的负速度使用明确标注的局部采样回退。
-- 新增 macOS／Windows 的 AE 离线安装器，内嵌载荷校验、完整备份、失败回滚与恢复；同步平台版本信息，以简短备份提示和自适应滚动布局保持操作可达。Cavalry 与 TouchDesigner 安装器仍是后续工作。
+- 新增 macOS／Windows 的 AE 离线安装器，内嵌载荷校验、完整备份、失败回滚与恢复；同步平台版本信息，以简短备份提示和自适应滚动布局保持操作可达，并校验 Windows ICO 目录项及完整 PNG 帧。Cavalry 与 TouchDesigner 安装器仍是后续工作。
 - 新增 1,015 项 AE 离线检查、69 项 TD 检查及安装器专项测试；macOS / AE 2026 完成 11 组原生曲线实测。Windows 原生构建与 CLI 验证不等同于 Windows AE 宿主实测。
 
 ## 1.2.0 for After Effects — 2026-11-06

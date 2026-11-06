@@ -37,7 +37,7 @@ python3 ae/installer/build_installer.py --platform macos   # 仅在 macOS
 python3 ae/installer/build_installer.py --platform windows # 仅在 Windows
 ```
 
-构建脚本由 `ae/packaging/` 生成并校验内嵌双语指南，检查面板逐文件哈希、完整备份、失败回滚和原生 CLI 安装，并同步系统版本元数据。macOS 输出 `.app` ZIP，写入 bundle 版本后做 ad-hoc 签名及解压回读；Windows 输出单文件 `.exe`，构建时以 `pefile` 回读固定版本和版本字符串。界面按文案与备份信息调整高度，屏幕高度不足时可滚动，底部操作不会被长路径裁掉。不提供交叉伪造平台包；Windows 原生 UI 与 Windows AE 仍需另做实测。
+构建脚本由 `ae/packaging/` 生成并校验内嵌双语指南，检查面板逐文件哈希、完整备份、失败回滚和原生 CLI 安装，并同步系统版本元数据。ICO 同时核对目录偏移、完整 PNG 帧和逐尺寸资源，不能只凭文件哈希判断可用性。macOS 输出 `.app` ZIP，写入 bundle 版本后做 ad-hoc 签名及解压回读；Windows 输出单文件 `.exe`，构建时以 `pefile` 回读固定版本和版本字符串。界面按文案与备份信息调整高度，屏幕高度不足时可滚动，底部操作不会被长路径裁掉。不提供交叉伪造平台包；Windows 原生 UI 与 Windows AE 仍需另做实测。
 
 ## 曲线与预设
 

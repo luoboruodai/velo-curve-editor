@@ -25,6 +25,16 @@ def verify_assets() -> dict:
     ico = (root / 'Velo.ico').read_bytes()
     if ico[:4] != b'\x00\x00\x01\x00' or struct.unpack('<H', ico[4:6])[0] != 7:
         raise ValueError('Windows ICO must contain seven independently generated PNG frames')
+    expected_offset = 6 + 16 * 7
+    for index in range(7):
+        width, height, _, _, _, _, size, offset = struct.unpack_from('<BBBBHHII', ico, 6 + index * 16)
+        if offset != expected_offset or offset + size > len(ico) or ico[offset:offset + 8] != b'\x89PNG\r\n\x1a\n':
+            raise ValueError(f'Invalid Windows ICO frame offset: {index}')
+        if struct.unpack('>II', ico[offset + 16:offset + 24]) != (width or 256, height or 256):
+            raise ValueError(f'Windows ICO frame dimensions differ: {index}')
+        expected_offset += size
+    if expected_offset != len(ico):
+        raise ValueError('Windows ICO frame data has an invalid length')
     if sys.platform == 'darwin' and (root / 'Velo.icns').read_bytes()[:4] != b'icns':
         raise ValueError('Invalid macOS ICNS resource')
     return manifest

@@ -87,11 +87,13 @@ def ppm(size: int) -> bytes:
 
 def make_ico(images: dict[int, bytes]) -> bytes:
     entries = []
+    frames = []
     offset = 6 + 16 * len(images)
     for size, data in images.items():
-        entries.append(struct.pack('<BBBBHHII', size % 256, size % 256, 0, 0, 1, 32, len(data), offset) + data)
+        entries.append(struct.pack('<BBBBHHII', size % 256, size % 256, 0, 0, 1, 32, len(data), offset))
+        frames.append(data)
         offset += len(data)
-    return struct.pack('<HHH', 0, 1, len(images)) + b''.join(entries)
+    return struct.pack('<HHH', 0, 1, len(images)) + b''.join(entries) + b''.join(frames)
 
 
 def main():

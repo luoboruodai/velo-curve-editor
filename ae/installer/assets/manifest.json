@@ -37,17 +37,17 @@
       "bytes": 11096,
       "sha256": "736e386d570db1726ce1dbf3060c24ae1cb417941c2cf54e65898b367fc15f0d"
     },
+    "icon32.ppm": {
+      "bytes": 3085,
+      "sha256": "5ccf0661609e8792d73cf3e1f7e006e7f84cc6ef1e555f603c431b82afbf1c20"
+    },
     "Velo.ico": {
       "bytes": 5615,
-      "sha256": "58dfa3932caac6df32276f47d28653e9672ede7dbdb24564f59f0e5e05a59012"
+      "sha256": "3a389debcacdca4cc0ea8da7dd5f0f6f257bc16495792dd657d880796bd57107"
     },
     "Velo.icns": {
       "bytes": 77746,
       "sha256": "ae15e9c11a03c05f6fc829f0ba3f2376478b5181ed0087cf5561baf6183e80c1"
-    },
-    "icon32.ppm": {
-      "bytes": 3085,
-      "sha256": "5ccf0661609e8792d73cf3e1f7e006e7f84cc6ef1e555f603c431b82afbf1c20"
     }
   }
 }
