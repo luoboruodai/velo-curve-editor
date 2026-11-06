@@ -28,9 +28,10 @@ Start with `PROJECT_CONTEXT.md`, then read only the modules needed for the curre
 - `ae/VeloAE/js/curve-model.js`: the shared curve, multi-segment, derivative and smoothing mathematics used by display, presets, JSON and AE output.
 - `ae/VeloAE/js/main.js`: CEP interaction, preset management, rendering and panel state. `ae/VeloAE/jsx/hostscript.jsx`: actual AE inspection, application, EaseCopy and native preset export.
 - `ae/tools/`: offline model, interface, i18n, preset-transfer and release-package checks. `ae/tools/build_release.py` builds only from a reviewed, committed source state.
-- `ae/packaging/`: concise offline bilingual installation guides. `docs/RELEASE_v1.2.0.md`: version-specific verification and platform boundaries.
+- `ae/installer/`: Tkinter native UI, offline payload builder, platform packager and transaction tests. Preserve complete backups, rollback on failure and per-user settings. Keep backup labels bounded, allow content-height scrolling, and synchronize bundle/PE version metadata. macOS and Windows installers must be built on their respective native platforms; do not cross-fabricate a package or claim unverified native UI.
+- `ae/packaging/`: concise offline bilingual installation guides. `docs/RELEASE_v1.2.1.md`: version-specific verification and platform boundaries.
 
-AE's native tab remains plain `Velo`. Keep both manifest versions and `hostscript.jsx`'s `VERSION` synchronized. CEP uses pointer-based preset dragging while the browser preview retains HTML5 drag-and-drop; both share `reorderPreset()`. Segment-key caching is based on the segment array reference, with scalar values always read afresh. Do not convert CEP CSS viewport checks into native-window or Windows-host claims.
+AE's native tab remains plain `Velo`. Keep both manifest versions and `hostscript.jsx`'s `VERSION` synchronized. `readCurve()` is separate from inspection. Multi-anchor Apply writes native keys and per-span easing where supported; hidden knots and linked spatial negative speeds use disclosed local sampling. Do not convert CEP CSS viewport checks into native-window or Windows-host claims.
 
 ## Change rules
 

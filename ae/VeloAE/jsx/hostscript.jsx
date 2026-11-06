@@ -1,5 +1,5 @@
 var VeloAE = (function () {
-    var VERSION = "1.2.0";
+    var VERSION = "1.2.1";
 
     function stringify(value) {
         var i, parts, key;
@@ -138,6 +138,120 @@ var VeloAE = (function () {
         }
     }
 
+    function dimensionDelta(start, end, dimension) {
+        return typeof start === "number" ? end - start : end[dimension] - start[dimension];
+    }
+
+    function importedHandle(ease, x, y, width, delta, duration, incoming) {
+        var influence = ease.influence / 100;
+        if (!numeric(influence) || influence < 0 || influence > 1 || !numeric(ease.speed) || Math.abs(delta) <= 0.000000000001 || duration <= 0) {
+            return [x + (incoming ? -1 : 1) * width / 3, y];
+        }
+        var offset = ease.speed * duration / delta * influence;
+        if (incoming) return [x - influence * width, y - offset];
+        return [x + influence * width, y + offset];
+    }
+
+    function importedSegment(prop, first, second, startTime, endTime) {
+        var start = prop.keyValue(first), end = prop.keyValue(second);
+        var dimensions = typeof start === "number" ? 1 : start.length;
+        if (endTime <= startTime || (typeof end === "number" ? dimensions !== 1 : !(end instanceof Array) || end.length !== dimensions)) return { error: "关键帧数值维度无效。" };
+        var width = endTime - startTime;
+        if (prop.keyOutInterpolationType(first) === KeyframeInterpolationType.HOLD || prop.keyInInterpolationType(second) === KeyframeInterpolationType.HOLD) return { error: "Hold 关键帧不能表示为连续 Bezier 曲线。" };
+        var linear = prop.keyOutInterpolationType(first) === KeyframeInterpolationType.LINEAR || prop.keyInInterpolationType(second) === KeyframeInterpolationType.LINEAR;
+        var outgoing = prop.keyOutTemporalEase(first), incoming = prop.keyInTemporalEase(second);
+        var reference = null, adjusted = false;
+        for (var dimension = 0; dimension < dimensions; dimension++) {
+            if ((outgoing.length !== 1 && outgoing.length !== dimensions) || (incoming.length !== 1 && incoming.length !== dimensions)) return { error: "关键帧缓动维度与数值不一致。" };
+            var outEase = outgoing.length === 1 ? outgoing[0] : outgoing[dimension], inEase = incoming.length === 1 ? incoming[0] : incoming[dimension];
+            var delta = dimensionDelta(start, end, dimension);
+            var left = [0, 0], right = [1, 1];
+            if (linear) {
+                left = [1 / 3, 1 / 3];
+                right = [2 / 3, 2 / 3];
+            } else {
+                left = importedHandle(outEase, 0, 0, width, delta, width, false);
+                right = importedHandle(inEase, 1, 1, width, delta, width, true);
+            }
+            if (!numeric(left[0]) || !numeric(left[1]) || !numeric(right[0]) || !numeric(right[1])) return { error: "关键帧包含无法读取的非有限切线。" };
+            if (Math.abs(left[1]) > 8 || Math.abs(right[1]) > 8) adjusted = true;
+            var segment = [[0, 0], left, right, [1, 1]];
+            if (Math.abs(delta) <= 0.000000000001) continue;
+            if (!reference) reference = segment;
+            else {
+                for (var point = 1; point < 3; point++) {
+                    if (Math.abs(reference[point][0] - segment[point][0]) > 0.000001 || Math.abs(reference[point][1] - segment[point][1]) > 0.000001) return { error: "各数值维度的归一化曲线不同，请逐个属性读取，不要压缩成一条曲线。" };
+                }
+            }
+        }
+        if (!reference) reference = [[0, 0], [1 / 3, 0], [2 / 3, 1], [1, 1]];
+        return { points: reference, adjusted: adjusted };
+    }
+
+    function normalizedAnchorValues(prop, keys) {
+        var first = prop.keyValue(keys[0]), last = prop.keyValue(keys[keys.length - 1]);
+        var dimensions = typeof first === "number" ? 1 : first.length, result = [];
+        for (var i = 0; i < keys.length; i++) {
+            var value = prop.keyValue(keys[i]), ratio = null;
+            for (var dimension = 0; dimension < dimensions; dimension++) {
+                var delta = dimensionDelta(first, last, dimension), current;
+                if (Math.abs(delta) <= 0.000000000001) {
+                    if (dimensionDelta(first, value, dimension) !== 0) return { error: "起止值相同但中间值不同，无法在保持端点的情况下归一化。" };
+                    continue;
+                }
+                current = dimensionDelta(first, value, dimension) / delta;
+                if (ratio === null) ratio = current;
+                else if (Math.abs(ratio - current) > 0.000001) return { error: "各数值维度的归一化关键帧值不同，请逐个属性读取。" };
+            }
+            if (ratio === null) ratio = i === keys.length - 1 ? 1 : 0;
+            result.push(ratio);
+        }
+        return { values: result };
+    }
+
+    function readTargetCurve(target) {
+        var prop = target.property, count = target.keys.length;
+        var startTime = prop.keyTime(target.keys[0]), endTime = prop.keyTime(target.keys[count - 1]);
+        var duration = endTime - startTime;
+        if (!(duration > 0)) return { error: "所选关键帧的时间范围无效。" };
+        var normalized = normalizedAnchorValues(prop, target.keys);
+        if (normalized.error) return { error: normalized.error };
+        var segments = [], times = [], values = [], adjusted = false;
+        for (var i = 0; i < count; i++) {
+            var index = target.keys[i];
+            var value = prop.keyValue(index);
+            if (valueKind(value, value) === "unsupported") return { error: "中间关键帧的数值维度不一致。" };
+            times.push(prop.keyTime(index));
+            values.push(value);
+            if (i === count - 1) continue;
+            var nextTime = prop.keyTime(target.keys[i + 1]);
+            var result = importedSegment(prop, index, target.keys[i + 1], prop.keyTime(index), nextTime);
+            if (result.error) return { error: result.error };
+            var from = (times[i] - startTime) / duration, to = (nextTime - startTime) / duration;
+            var y0 = normalized.values[i], y1 = normalized.values[i + 1], delta = y1 - y0, points = result.points;
+            segments.push([[from, y0], [from + (to - from) * points[1][0], y0 + points[1][1] * delta], [from + (to - from) * points[2][0], y0 + points[2][1] * delta], [to, y1]]);
+            adjusted = adjusted || result.adjusted;
+        }
+        return { name: target.name, kind: target.kind, dimensions: target.kind === "scalar" ? 1 : values[0].length, segments: segments, keyTimes: times, values: values, startTime: startTime, endTime: endTime, adjusted: adjusted };
+    }
+
+    function readCurve() {
+        try {
+            var selection = collectTargets(), skipped = selection.skipped.slice(0), curve = null, deferred = 0;
+            for (var i = 0; i < selection.targets.length; i++) {
+                var target = selection.targets[i];
+                var result = readTargetCurve(target);
+                if (result.error) skipped.push({ property: target.name, reason: result.error });
+                else if (!curve) curve = result;
+                else deferred++;
+            }
+            if (!curve) return fail(skipped.length ? skipped[0].reason : "没有可读取的 Bezier 曲线；请选择连续数值关键帧。", { skipped: skipped });
+            return ok({ curve: curve, segments: curve.segments, propertyCount: selection.targets.length, deferredCount: deferred, skipped: skipped });
+        } catch (error) {
+            return fail("读取曲线失败：" + error, { line: error.line || 0 });
+        }
+    }
+
     function sampleAt(samples, u) {
         if (u <= 0) return samples[0];
         if (u >= 1) return samples[samples.length - 1];
@@ -183,6 +297,155 @@ var VeloAE = (function () {
         prop.setTemporalEaseAtKey(endIndex, [easeFor(points, endValue - startValue, duration, true)], prop.keyOutTemporalEase(endIndex));
         prop.setSelectedAtKey(startIndex, true);
         prop.setSelectedAtKey(endIndex, true);
+    }
+
+    function hiddenAt(hidden, x) {
+        for (var i = 0; i < hidden.length; i++) if (Math.abs(hidden[i] - x) <= 0.000000001) return true;
+        return false;
+    }
+
+    function validNativeSegments(segments, hidden) {
+        if (!(segments instanceof Array) || !segments.length || segments.length > 16 || !(hidden instanceof Array) || hidden.length >= segments.length) return false;
+        if (segments[0][0][0] !== 0 || segments[0][0][1] !== 0 || segments[segments.length - 1][3][0] !== 1 || segments[segments.length - 1][3][1] !== 1) return false;
+        for (var i = 0; i < segments.length; i++) {
+            var segment = segments[i];
+            if (!(segment instanceof Array) || segment.length !== 4) return false;
+            for (var j = 0; j < 4; j++) {
+                if (!(segment[j] instanceof Array) || segment[j].length !== 2 || !numeric(segment[j][0]) || !numeric(segment[j][1]) || Math.abs(segment[j][1]) > 8) return false;
+                if (segment[j][0] < segment[0][0] || segment[j][0] > segment[3][0]) return false;
+            }
+            if (segment[0][0] >= segment[3][0]) return false;
+            if (i && (Math.abs(segments[i - 1][3][0] - segment[0][0]) > 0.000000001 || Math.abs(segments[i - 1][3][1] - segment[0][1]) > 0.000000001)) return false;
+        }
+        for (i = 0; i < hidden.length; i++) {
+            var found = false;
+            if (!numeric(hidden[i]) || hidden[i] <= 0 || hidden[i] >= 1) return false;
+            for (var j = 0; j < segments.length - 1; j++) if (Math.abs(segments[j][3][0] - hidden[i]) <= 0.000000001) found = true;
+            if (!found) return false;
+            for (j = i + 1; j < hidden.length; j++) if (Math.abs(hidden[i] - hidden[j]) <= 0.000000001) return false;
+        }
+        return true;
+    }
+
+    function multiPlan(target, payload, frameDuration) {
+        var prop = target.property, segments = payload.segments, hidden = payload.hiddenAnchors;
+        var startIndex = keyAt(prop, prop.keyTime(target.keys[0])), endIndex = keyAt(prop, prop.keyTime(target.keys[target.keys.length - 1]));
+        var startTime = prop.keyTime(startIndex), endTime = prop.keyTime(endIndex), duration = endTime - startTime;
+        if (!(duration > 0) || !(frameDuration > 0)) throw new Error("所选关键帧的时间范围无效。");
+        var plan = {
+            property: prop, startTime: startTime, endTime: endTime, duration: duration,
+            startValue: prop.keyValue(startIndex), endValue: prop.keyValue(endIndex),
+            firstInEase: prop.keyInTemporalEase(startIndex), lastOutEase: prop.keyOutTemporalEase(endIndex),
+            firstInType: prop.keyInInterpolationType(startIndex), lastOutType: prop.keyOutInterpolationType(endIndex),
+            beforeCount: prop.numKeys, anchors: [], spans: [], removeTimes: [], matched: 0
+        };
+        var sharedSpatial = target.kind === "array" && prop.isSpatial === true && prop.keyOutTemporalEase(startIndex).length === 1;
+        var active = null;
+        for (var i = 0; i < segments.length; i++) {
+            if (!active) active = { first: i, from: segments[i][0][0], fromY: segments[i][0][1] };
+            active.last = i;
+            active.to = segments[i][3][0];
+            active.toY = segments[i][3][1];
+            if (!hiddenAt(hidden, active.to)) {
+                active.baked = active.last > active.first;
+                plan.spans.push(active);
+                active = null;
+            }
+        }
+        for (i = 0; i < plan.spans.length; i++) {
+            var span = plan.spans[i], first = segments[span.first], last = segments[span.last];
+            span.spatial = sharedSpatial && (first[1][1] < first[0][1] || last[3][1] < last[2][1]);
+            span.baked = span.baked || span.spatial;
+            if (!plan.anchors.length) plan.anchors.push({ point: first[0], incoming: null, outgoing: [first[1][0], first[1][1], 0, 0] });
+            else plan.anchors[plan.anchors.length - 1].outgoing = [first[1][0], first[1][1], 0, 0];
+            var anchor = { point: last[3], incoming: [0, 0, last[2][0], last[2][1]], outgoing: null };
+            anchor.time = startTime + duration * anchor.point[0];
+            anchor.frame = Math.round(anchor.time / frameDuration);
+            if (plan.anchors.length && plan.anchors[plan.anchors.length - 1].frame === anchor.frame) throw new Error("锚点在 AE 帧精度下过近，请拉开点位后再应用。");
+            if (span.baked && anchor.frame - plan.anchors[plan.anchors.length - 1].frame < 2) throw new Error("保形区段少于一帧，无法在不重建隐藏锚点的情况下保留形状。");
+            plan.anchors.push(anchor);
+        }
+        plan.anchors[0].time = startTime;
+        plan.anchors[0].frame = Math.round(startTime / frameDuration);
+        for (i = 1; i < target.keys.length - 1; i++) {
+            var time = prop.keyTime(target.keys[i]), keep = false;
+            for (var j = 0; j < plan.anchors.length; j++) if (Math.abs(plan.anchors[j].time - time) <= 0.0001) keep = true;
+            if (keep) plan.matched++;
+            else plan.removeTimes.push(time);
+        }
+        for (i = 0; i < plan.anchors.length; i++) {
+            time = plan.anchors[i].time;
+            if (Math.abs(time - startTime) <= 0.0001 || Math.abs(time - endTime) <= 0.0001) plan.matched++;
+        }
+        return plan;
+    }
+
+    function easeSideFor(points, span, plan, incoming, easeCount) {
+        var start = lerp(plan.startValue, plan.endValue, span.fromY), end = lerp(plan.startValue, plan.endValue, span.toY);
+        var duration = plan.duration * (span.to - span.from), valueSpan = span.toY - span.fromY;
+        var x = incoming ? points[2] : points[0], y = incoming ? points[3] : points[1];
+        var localX = (x - span.from) / (span.to - span.from);
+        var localY = Math.abs(valueSpan) <= 0.000000000001 ? (incoming ? 1 : 0) : (y - span.fromY) / valueSpan;
+        var local = incoming ? [0, 0, localX, localY] : [localX, localY, 0, 0];
+        var dimensions = typeof start === "number" ? 1 : start.length;
+        if (easeCount < 1 || easeCount > dimensions) throw new Error("AE 返回的缓动组数与数值维度不兼容。");
+        var result = [];
+        for (var dimension = 0; dimension < dimensions; dimension++) result.push(easeFor(local, dimensionDelta(start, end, dimension), duration, incoming));
+        return easeCount === 1 ? [result[0]] : result;
+    }
+
+    function sampleNativeSpan(plan, span, samples, frameDuration, hidden) {
+        var prop = plan.property, startTime = plan.startTime + plan.duration * span.from, endTime = plan.startTime + plan.duration * span.to;
+        var startIndex = keyAt(prop, startTime), endIndex = keyAt(prop, endTime), duration = endTime - startTime;
+        var steps = Math.max(2, Math.ceil(duration / frameDuration)), capped = steps > 512;
+        if (capped) steps = 512;
+        prop.setInterpolationTypeAtKey(startIndex, prop.keyInInterpolationType(startIndex), KeyframeInterpolationType.LINEAR);
+        var created = 0;
+        for (var i = 1; i < steps; i++) {
+            var fraction = i / steps, u = span.from + (span.to - span.from) * fraction;
+            if (hiddenAt(hidden, u)) continue;
+            var time = startTime + duration * fraction;
+            prop.setValueAtTime(time, lerp(plan.startValue, plan.endValue, sampleAt(samples, u)));
+            var index = keyAt(prop, time);
+            prop.setInterpolationTypeAtKey(index, KeyframeInterpolationType.LINEAR, KeyframeInterpolationType.LINEAR);
+            prop.setSelectedAtKey(index, true);
+            created++;
+        }
+        endIndex = keyAt(prop, endTime);
+        prop.setInterpolationTypeAtKey(endIndex, KeyframeInterpolationType.LINEAR, prop.keyOutInterpolationType(endIndex));
+        return { created: created, capped: capped };
+    }
+
+    function applyMulti(plan, payload, frameDuration) {
+        var prop = plan.property, i, index;
+        for (i = plan.removeTimes.length - 1; i >= 0; i--) prop.removeKey(keyAt(prop, plan.removeTimes[i]));
+        for (i = 0; i < plan.anchors.length; i++) {
+            var anchor = plan.anchors[i];
+            prop.setValueAtTime(anchor.time, lerp(plan.startValue, plan.endValue, anchor.point[1]));
+        }
+        var created = 0, capped = 0, baked = 0, spatial = 0;
+        for (i = 0; i < plan.spans.length; i++) {
+            if (!plan.spans[i].baked) continue;
+            var sampled = sampleNativeSpan(plan, plan.spans[i], payload.samples, frameDuration, payload.hiddenAnchors || []);
+            created += sampled.created;
+            capped += sampled.capped ? 1 : 0;
+            baked++;
+            if (plan.spans[i].spatial) spatial++;
+        }
+        for (i = 0; i < plan.anchors.length; i++) {
+            anchor = plan.anchors[i];
+            index = keyAt(prop, anchor.time);
+            var incoming = i === 0 ? plan.firstInEase : easeSideFor(anchor.incoming, plan.spans[i - 1], plan, true, prop.keyInTemporalEase(index).length);
+            var outgoing = i === plan.anchors.length - 1 ? plan.lastOutEase : easeSideFor(anchor.outgoing, plan.spans[i], plan, false, prop.keyOutTemporalEase(index).length);
+            var inType = i === 0 ? plan.firstInType : KeyframeInterpolationType.BEZIER;
+            var outType = i === plan.anchors.length - 1 ? plan.lastOutType : KeyframeInterpolationType.BEZIER;
+            prop.setInterpolationTypeAtKey(index, inType, outType);
+            prop.setTemporalEaseAtKey(index, incoming, outgoing);
+            prop.setSelectedAtKey(index, true);
+        }
+        for (i = 0; i < plan.anchors.length; i++) prop.setSelectedAtKey(keyAt(prop, plan.anchors[i].time), true);
+        created += plan.anchors.length - plan.matched;
+        return { created: created, removed: plan.removeTimes.length, capped: capped, baked: baked, spatial: spatial, "native": plan.spans.length - baked, anchors: plan.anchors.length };
     }
 
     function applyBaked(target, startTime, endTime, samples, frameDuration, times) {
@@ -236,16 +499,34 @@ var VeloAE = (function () {
         try {
             if (!payload || !/^(bezier|elastic|bounce)$/.test(payload.mode)) return fail("无效的曲线模式。");
             if (!validSamples(payload.samples)) return fail("曲线采样无效；请重置曲线后重试。");
-            var nativeBezier = payload.mode === "bezier" && payload.points !== undefined;
+            var nativeMulti = payload.mode === "bezier" && payload.segments !== undefined;
+            var nativeBezier = payload.mode === "bezier" && payload.points !== undefined && !nativeMulti;
+            if (nativeMulti && !validNativeSegments(payload.segments, payload.hiddenAnchors || [])) return fail("多段 Bezier 锚点或手柄无效。");
             if (nativeBezier && !validPoints(payload.points)) return fail("Bezier 手柄超出 AE 原生缓动范围。");
-            if (payload.times !== undefined && (nativeBezier || !validTimes(payload.times, payload.samples))) return fail("多段曲线时间采样无效。");
+            if (payload.times !== undefined && (nativeMulti || nativeBezier || !validTimes(payload.times, payload.samples))) return fail("多段曲线时间采样无效。");
             var selection = collectTargets();
             if (!selection.targets.length) return fail("请在一个或多个数值属性上选择至少两个相邻关键帧。", { skipped: selection.skipped });
+            var plans = [];
+            if (nativeMulti) {
+                for (var p = 0; p < selection.targets.length; p++) plans.push(multiPlan(selection.targets[p], payload, selection.comp.frameDuration));
+            }
             app.beginUndoGroup("Velo AE — Apply " + payload.mode);
             began = true;
-            var nativeSegments = 0, bakedSegments = 0, createdKeys = 0, cappedSegments = 0, methods = [];
+            var nativeSegments = 0, bakedSegments = 0, createdKeys = 0, removedKeys = 0, cappedSegments = 0, preservedSegments = 0, nativeAnchors = 0, methods = [];
             for (var i = 0; i < selection.targets.length; i++) {
                 var target = selection.targets[i];
+                if (nativeMulti) {
+                    var multi = applyMulti(plans[i], payload, selection.comp.frameDuration);
+                    nativeSegments += multi["native"];
+                    bakedSegments += multi.baked;
+                    preservedSegments += multi.baked;
+                    createdKeys += multi.created;
+                    removedKeys += multi.removed;
+                    cappedSegments += multi.capped;
+                    nativeAnchors += multi.anchors;
+                    methods.push({ property: target.name, nativeSegments: multi["native"], bakedSegments: multi.baked, spatialSegments: multi.spatial, anchors: multi.anchors });
+                    continue;
+                }
                 var nativeCount = 0, bakedCount = 0;
                 for (var j = 0; j < target.keys.length - 1; j++) {
                     var startTime = target.property.keyTime(target.keys[j]);
@@ -273,7 +554,10 @@ var VeloAE = (function () {
                 segmentCount: nativeSegments + bakedSegments,
                 nativeSegments: nativeSegments,
                 bakedSegments: bakedSegments,
+                shapePreservedSegments: preservedSegments,
+                nativeAnchors: nativeAnchors,
                 createdKeys: createdKeys,
+                removedKeys: removedKeys,
                 cappedSegments: cappedSegments,
                 methods: methods,
                 skipped: selection.skipped,
@@ -497,7 +781,7 @@ var VeloAE = (function () {
         }
     }
 
-    return { ping: ping, inspect: inspect, apply: apply, exportPresetFile: exportPresetFile, easeCopyCopy: easeCopyCopy, easeCopyPaste: easeCopyPaste, stringify: stringify, version: VERSION };
+    return { ping: ping, inspect: inspect, readCurve: readCurve, apply: apply, exportPresetFile: exportPresetFile, easeCopyCopy: easeCopyCopy, easeCopyPaste: easeCopyPaste, stringify: stringify, version: VERSION };
 }());
 
 "VeloAE host ready";

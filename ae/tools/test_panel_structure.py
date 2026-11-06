@@ -34,7 +34,7 @@ for relative in re.findall(r'(?:src|href)="([^"]+)"', html):
 for element_id in (
     'appContainer', 'curveCanvas', 'settingsBtn', 'directionBtn', 'bezierJsonOutput',
     'ampSlider', 'freqSlider', 'corSlider', 'periodSlider', 'pasteBtn', 'resetBtn',
-    'reverseBtn', 'smoothAllBtn', 'savePresetBtn', 'inspectBtn', 'applyBtn', 'presetPanel', 'presetList',
+    'reverseBtn', 'smoothAllBtn', 'savePresetBtn', 'inspectBtn', 'readCurveBtn', 'applyBtn', 'presetPanel', 'presetList',
     'settingsModal', 'closeSettingsBtn', 'languageSelect', 'presetLocation', 'compactToggle', 'speedToggle',
     'viewGroup', 'motionToggle', 'presetSize', 'restorePresetsBtn', 'presetContextMenu',
     'anchorContextMenu', 'anchorSmoothBtn', 'anchorPreserveDeleteBtn', 'anchorDeleteBtn', 'tangentSnapHint',
@@ -61,7 +61,8 @@ check('ui.exportPath.textContent' in main and 'ui.exportPath.title = result.path
 check('model.sample' in main, 'shared model supplies samples')
 check('navigator.clipboard.writeText(text).catch(fallback)' in main and 'navigator.clipboard.readText().catch(fallback)' in main, 'clipboard permission rejections reach the existing copy and manual-paste fallbacks')
 check("addEventListener('dblclick', addPoint)" in main and "addEventListener('contextmenu', deletePoint)" in main, 'double-click insertion and right-click deletion are wired to the canvas')
-check('payload.times = model.sampleTimes(state, 257)' in main and '!model.validSegments(payload.state.segments)' in main, 'multi-segment host samples and curve JSON validation are wired')
+check('payload.segments = model.serializable(state).segments' in main and 'payload.hiddenAnchors = state.hiddenAnchors || []' in main and '!model.validSegments(payload.state.segments)' in main, 'multi-segment native output, hidden-anchor metadata and curve JSON validation are wired')
+check('VeloAE.readCurve()' in main and "ui.read.addEventListener('click', readHostCurve)" in main, 'reading AE curves is a separate action from target inspection')
 check('pointerdown' in main and 'pointermove' in main and 'pointercancel' in main, 'pointer drag lifecycle exists')
 check('Math.hypot(x - candidate.x, y - candidate.y)' in main and 'rect.left + candidate.x' not in main, 'handle hit testing uses one local coordinate space')
 check('setPointerCapture' in main and 'document-level move/up remains available' in main, 'drag survives pointer capture failure')
@@ -156,11 +157,12 @@ check("ui.language.addEventListener('change'" in main and 'applyLanguage(setting
 check('renderStatus();' in main and 'updateEaseBuffer();' in main and 'renderPresetList();' in main, 'language refresh covers status, counts, and presets')
 
 jsx = (PANEL / 'jsx' / 'hostscript.jsx').read_text(encoding='utf-8')
-for name in ('ping', 'inspect', 'apply', 'exportPresetFile', 'easeCopyCopy', 'easeCopyPaste', 'passthrough', 'stringify', 'beginUndoGroup', 'endUndoGroup', 'setTemporalEaseAtKey', 'setValueAtTime'):
+for name in ('ping', 'inspect', 'readCurve', 'apply', 'exportPresetFile', 'easeCopyCopy', 'easeCopyPaste', 'passthrough', 'stringify', 'beginUndoGroup', 'endUndoGroup', 'setTemporalEaseAtKey', 'setValueAtTime'):
     check(name in jsx, f'host capability: {name}')
 check('File.saveDialog' in jsx and 'file.fsName' in jsx, 'native export returns the user-selected save path')
 check('cancelled: true' in jsx and 'file.write(payload)' in jsx, 'native export distinguishes cancellation from an actual file write')
-check('function validTimes' in jsx and 'times[i]' in jsx, 'multi-segment Apply validates and uses exact anchor sample times')
+check('function validNativeSegments' in jsx and 'function applyMulti' in jsx and 'function easeSideFor' in jsx, 'multi-anchor Apply writes per-dimension native temporal easing')
+check('hiddenAt(hidden, u)' in jsx and 'shapePreservedSegments' in jsx, 'hidden anchors stay out of sampled keys and the local fallback is reported explicitly')
 check('Math.abs(prop.keyTime(index) - time) > 0.0001' in jsx, 'key lookup tolerates AE frame-time quantization without losing new keys')
 value_paste = jsx.split('if (payload.kind === "value") {', 1)[1].split('} else if (targets.length === 1) {', 1)[0]
 check('var originalEases = [];' in value_paste and 'inEase: prop.keyInTemporalEase(targets[v].index)' in value_paste and 'outEase: prop.keyOutTemporalEase(targets[v].index)' in value_paste, 'value paste captures both target ease sides before AE can recalculate them')

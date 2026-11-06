@@ -63,7 +63,7 @@ const actionsStart = html.indexOf('<div class="actions">');
 check(actionsStart > 0 && !html.slice(actionsStart).includes('id="status"'), 'the old bottom status is removed instead of duplicated');
 check(!source.includes('setWindowTitle') && !source.includes('renderWindowTitle'), 'status changes never rewrite the macOS window title');
 check(manifest.includes('<Menu>Velo</Menu>') && !manifest.includes('🟢'), 'the native AE tab is plain Velo without the green icon');
-check((manifest.match(/1\.2\.0/g) || []).length === 2, 'both manifest versions are 1.2.0');
+check((manifest.match(/1\.2\.1/g) || []).length === 2, 'both manifest versions are 1.2.1');
 check(html.includes('id="healthDot"') && html.includes('id="statusText"'), 'breathing health and readable status remain available');
 check(declaration('renderStatus').includes('ui.status.title = text') && declaration('renderStatus').includes('ui.status.dataset.state = health'), 'the badge preserves full tooltip text and its state mapping');
 check(declaration('renderStatus').includes('status.compactWarning') && declaration('renderStatus').includes('status.compactError'), 'the header uses short state labels instead of expanding for full messages');

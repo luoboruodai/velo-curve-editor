@@ -834,10 +834,10 @@
   LANGUAGES.forEach(function (language) { Object.assign(dictionaries[language], dialogDictionaries[language]); });
 
   var busyDictionaries = {
-    'zh-CN': { 'status.inspecting': '正在检查 AE 目标…', 'status.applying': '正在应用曲线…' },
-    en: { 'status.inspecting': 'Inspecting AE target…', 'status.applying': 'Applying curve…' },
-    ja: { 'status.inspecting': 'AE ターゲットを検査中…', 'status.applying': 'カーブを適用中…' },
-    ko: { 'status.inspecting': 'AE 대상 검사 중…', 'status.applying': '곡선 적용 중…' }
+    'zh-CN': { 'status.inspecting': '正在检查 AE 目标…', 'status.reading': '正在读取 AE 曲线…', 'status.applying': '正在应用曲线…' },
+    en: { 'status.inspecting': 'Inspecting AE target…', 'status.reading': 'Reading AE curve…', 'status.applying': 'Applying curve…' },
+    ja: { 'status.inspecting': 'AE ターゲットを検査中…', 'status.reading': 'AE カーブを読み込み中…', 'status.applying': 'カーブを適用中…' },
+    ko: { 'status.inspecting': 'AE 대상 검사 중…', 'status.reading': 'AE 곡선 읽는 중…', 'status.applying': '곡선 적용 중…' }
   };
   LANGUAGES.forEach(function (language) { Object.assign(dictionaries[language], busyDictionaries[language]); });
 
@@ -848,6 +848,53 @@
     ko: { 'status.compactWarning': '알림', 'status.compactBusy': '처리 중', 'status.compactError': '오류', 'toast.close': '알림 닫기' }
   };
   LANGUAGES.forEach(function (language) { Object.assign(dictionaries[language], toastDictionaries[language]); });
+
+  var nativeCurveDictionaries = {
+    'zh-CN': {
+      'action.read': '读取曲线', 'action.readTitle': '读取 AE 已选关键帧的数值和切线',
+      'status.read': '已读取 {name} · {keys} 个关键帧',
+      'status.readDeferred': '已读取 {name} · 其余 {deferred} 个属性未导入',
+      'status.readAdjusted': '已读取 {name} · 极端手柄已按编辑器范围适配',
+      'status.appliedNative': '已原生应用 {segmentCount} 段 · 新增 {createdKeys} · 删除冗余 {removedKeys} · 可一次撤销',
+      'status.appliedMixed': '原生 {nativeSegments} 段 · 保形采样 {bakedSegments} 段 · 新增 {createdKeys} · 可一次撤销',
+      'error.read': '读取失败：{detail}'
+    },
+    en: {
+      'action.read': 'Read', 'action.readTitle': 'Read values and tangents from selected AE keyframes',
+      'status.read': '{name} imported · {keys} keyframes',
+      'status.readDeferred': '{name} imported · {deferred} other properties not imported',
+      'status.readAdjusted': '{name} imported · Extreme handles adapted to the editor range',
+      'status.appliedNative': 'Native segments: {segmentCount} · Added: {createdKeys} · Redundant removed: {removedKeys} · One undo step',
+      'status.appliedMixed': 'Native: {nativeSegments} · Shape-preserving samples: {bakedSegments} · Added: {createdKeys} · One undo step',
+      'error.read': 'Read failed: {detail}'
+    },
+    ja: {
+      'action.read': '読込', 'action.readTitle': 'AE で選択したキーフレームの値と接線を読み込む',
+      'status.read': '{name} を読み込みました · {keys} 個のキーフレーム',
+      'status.readDeferred': '{name} を読み込みました · 他の {deferred} 個のプロパティは未読込',
+      'status.readAdjusted': '{name} を読み込みました · 極端なハンドルを編集範囲に調整',
+      'status.appliedNative': 'ネイティブ適用 {segmentCount} 段 · 追加 {createdKeys} · 冗長削除 {removedKeys} · 1 回で取り消せます',
+      'status.appliedMixed': 'ネイティブ {nativeSegments} 段 · 形状保持サンプル {bakedSegments} 段 · 追加 {createdKeys} · 1 回で取り消せます',
+      'error.read': '読み込みに失敗しました: {detail}'
+    },
+    ko: {
+      'action.read': '읽기', 'action.readTitle': 'AE에서 선택한 키프레임의 값과 접선 읽기',
+      'status.read': '{name} 읽기 완료 · 키프레임 {keys}개',
+      'status.readDeferred': '{name} 읽기 완료 · 다른 속성 {deferred}개는 읽지 않음',
+      'status.readAdjusted': '{name} 읽기 완료 · 극단적 핸들을 편집 범위에 맞춤',
+      'status.appliedNative': '네이티브 적용 {segmentCount}개 · 추가 {createdKeys}개 · 중복 삭제 {removedKeys}개 · 한 번에 실행 취소',
+      'status.appliedMixed': '네이티브 {nativeSegments}개 · 형태 유지 샘플 {bakedSegments}개 · 추가 {createdKeys}개 · 한 번에 실행 취소',
+      'error.read': '읽기 실패: {detail}'
+    }
+  };
+  LANGUAGES.forEach(function (language) { Object.assign(dictionaries[language], nativeCurveDictionaries[language]); });
+  var inspectOnlyTitles = {
+    'zh-CN': '只检查 AE 选区，不修改当前曲线',
+    en: 'Inspect the AE selection without changing the current curve',
+    ja: 'AE の選択範囲だけを検査し、現在のカーブは変更しません',
+    ko: 'AE 선택 영역만 검사하며 현재 곡선은 변경하지 않습니다'
+  };
+  LANGUAGES.forEach(function (language) { dictionaries[language]['action.inspectTitle'] = inspectOnlyTitles[language]; });
 
   var currentLanguage = DEFAULT_LANGUAGE;
   function hasOwn(object, key) { return Object.prototype.hasOwnProperty.call(object, key); }

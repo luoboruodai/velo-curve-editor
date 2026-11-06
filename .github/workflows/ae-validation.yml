@@ -42,11 +42,60 @@ jobs:
           for file in ae/tools/test_panel_structure.py ae/tools/test_theme_tokens.py ae/tools/test_td_parity.py ae/tools/test_release.py; do
             python3 "$file"
           done
+      - name: Installer transaction and resource tests
+        shell: bash
+        run: python3 -m unittest discover -s ae/installer/tests -v
+
+  installer-macos:
+    name: Native macOS installer
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: offline
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r ae/installer/requirements-build.txt
+      - run: python3 -m unittest discover -s ae/installer/tests -v
+      - run: python3 ae/installer/build_installer.py --platform macos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VeloInstaller-${{ github.ref_name }}-macOS
+          path: |
+            dist/VeloInstaller_v1.2.1_macOS.zip
+            dist/VeloInstaller_v1.2.1_macos.manifest.json
+            dist/VeloInstaller_v1.2.1_macos_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  installer-windows:
+    name: Native Windows installer
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: offline
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install -r ae/installer/requirements-build.txt
+      - run: python3 -m unittest discover -s ae/installer/tests -v
+      - run: python3 ae/installer/build_installer.py --platform windows
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VeloInstaller-${{ github.ref_name }}-Windows
+          path: |
+            dist/VeloInstaller_v1.2.1_Windows.exe
+            dist/VeloInstaller_v1.2.1_windows.manifest.json
+            dist/VeloInstaller_v1.2.1_windows_SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14
 
   package:
     name: Validate tagged portable package
     if: startsWith(github.ref, 'refs/tags/')
-    needs: offline
+    needs: [offline, installer-macos, installer-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +112,7 @@ jobs:
           import hashlib
           import zipfile
           from pathlib import Path
-          version = '1.2.0'
+          version = '1.2.1'
           archive = Path(f'dist/VeloAE_v{version}_macOS_Windows.zip')
           checksum = Path(f'dist/VeloAE_v{version}_SHA256SUMS.txt').read_text(encoding='utf-8').split()[0]
           assert archive.is_file()
@@ -79,8 +128,8 @@ jobs:
         with:
           name: VeloAE-${{ github.ref_name }}-portable-validation
           path: |
-            dist/VeloAE_v1.2.0_macOS_Windows.zip
-            dist/VeloAE_v1.2.0_macOS_Windows.manifest.json
-            dist/VeloAE_v1.2.0_SHA256SUMS.txt
+            dist/VeloAE_v1.2.1_macOS_Windows.zip
+            dist/VeloAE_v1.2.1_macOS_Windows.manifest.json
+            dist/VeloAE_v1.2.1_SHA256SUMS.txt
           if-no-files-found: error
           retention-days: 14

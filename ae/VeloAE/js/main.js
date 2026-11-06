@@ -14,7 +14,7 @@
     bezierPanel: $('bezierDataPanel'), elasticPanel: $('elasticParamsPanel'), bouncePanel: $('bounceParamsPanel'),
     amp: $('ampSlider'), freq: $('freqSlider'), cor: $('corSlider'), period: $('periodSlider'),
     paste: $('pasteBtn'), reset: $('resetBtn'), reverse: $('reverseBtn'), smoothAll: $('smoothAllBtn'), save: $('savePresetBtn'),
-    inspect: $('inspectBtn'), apply: $('applyBtn'), status: $('status'),
+    inspect: $('inspectBtn'), read: $('readCurveBtn'), apply: $('applyBtn'), status: $('status'),
     presetPanel: $('presetPanel'), presetList: $('presetList'), resizer: $('panelResizer'),
     modal: $('settingsModal'), closeSettings: $('closeSettingsBtn'), location: $('presetLocation'), language: $('languageSelect'),
     compact: $('compactToggle'), speed: $('speedToggle'), autoInspect: $('autoApplyPreset'), defaults: $('resetDefaultsBtn'),
@@ -131,8 +131,8 @@
 
   function statusHealth() {
     if (currentStatus.isError) return 'error';
-    if (['status.inspecting', 'status.applying'].includes(currentStatus.key)) return 'busy';
-    if (['status.pointTooClose', 'status.pointLimit', 'status.multiPointUnavailable', 'status.browserPreview', 'status.browserNoWrite', 'status.inspectUnavailable', 'status.inspectUnavailableSkipped'].includes(currentStatus.key)) return 'warning';
+    if (['status.inspecting', 'status.reading', 'status.applying'].includes(currentStatus.key)) return 'busy';
+    if (['status.pointTooClose', 'status.pointLimit', 'status.multiPointUnavailable', 'status.browserPreview', 'status.browserNoWrite', 'status.inspectUnavailable', 'status.inspectUnavailableSkipped', 'status.readDeferred', 'status.readAdjusted', 'status.appliedMixed'].includes(currentStatus.key)) return 'warning';
     return 'ready';
   }
 
@@ -1024,24 +1024,49 @@
     }
   }
 
+  async function readHostCurve() {
+    showStatus('status.reading');
+    try {
+      const result = await hostCall('VeloAE.readCurve()');
+      if (!result) { showStatus('status.browserPreview'); return; }
+      if (!result.ok) throw result.error ? new Error(result.error) : translatedError('error.invalidCurveJson');
+      if (!result.curve || !model.validSegments(result.curve.segments)) throw translatedError('error.invalidCurveJson');
+      state = model.normalize({ mode: 'bezier', segments: result.curve.segments });
+      editView = 'value';
+      speedViewRange = null;
+      clearPresetSelection();
+      updateControls();
+      const params = { name: result.curve.name, keys: result.curve.keyTimes.length, deferred: result.deferredCount };
+      const key = result.curve.adjusted ? 'status.readAdjusted' : (result.deferredCount ? 'status.readDeferred' : 'status.read');
+      showStatus(key, params);
+    } catch (error) {
+      showError(error, 'error.read');
+    }
+  }
+
   async function applyHost() {
     try {
       if (settings.autoInspect) {
         const inspection = await inspectHost();
         if (inspection && !inspection.canApply) return;
       }
-      const payload = { mode: state.mode, samples: model.sample(state, 257).values };
+      const payload = { mode: state.mode, samples: model.sample(state, state.segments ? 1025 : 257).values };
       if (state.mode === 'bezier' && state.segments) {
-        payload.times = model.sampleTimes(state, 257);
-        payload.samples = payload.times.map((u) => model.valueAndSpeed(state, u)[0]);
+        payload.segments = model.serializable(state).segments;
+        payload.hiddenAnchors = state.hiddenAnchors || [];
       } else if (state.mode === 'bezier') {
         payload.points = [state.x1, state.y1, state.x2, state.y2];
       }
       const result = await hostCall(`VeloAE.apply(${JSON.stringify(payload)})`);
       if (!result) { showStatus('status.browserNoWrite'); return; }
       if (!result.ok) throw result.error ? new Error(result.error) : translatedError('error.applyFailed');
-      if (result.message) showStatus('status.raw', { text: result.message });
-      else showStatus('status.applied', { segmentCount: result.segmentCount, createdKeys: result.createdKeys });
+      if (result.shapePreservedSegments) {
+        showStatus('status.appliedMixed', result);
+      } else if (result.nativeSegments) {
+        showStatus('status.appliedNative', result);
+      } else {
+        showStatus('status.applied', { segmentCount: result.segmentCount, createdKeys: result.createdKeys });
+      }
     } catch (error) {
       showError(error, 'error.apply');
     }
@@ -1994,6 +2019,7 @@
       }
     }
   });
+  ui.read.addEventListener('click', readHostCurve);
   ui.inspect.addEventListener('click', inspectHost);
   ui.apply.addEventListener('click', applyHost);
 

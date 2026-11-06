@@ -1,6 +1,6 @@
 # Velo project context
 
-Last updated: **2026-11-06 · AE v1.2.0 / TD v1.1.0**
+Last updated: **2026-11-06 · AE v1.2.1 / TD v1.1.0**
 
 This is the compact, public handoff for future agents and maintainers. It preserves product intent, architecture, verified decisions and failure boundaries without private chat logs, local paths, credentials or real user data.
 
@@ -15,17 +15,18 @@ Current capabilities:
 - Built-in and user presets, EaseCopy, adaptive accent themes and native settings.
 - Live CHOP output plus opt-in native Animation COMP keyframe export.
 
-## 1A. After Effects v1.2.0
+## 1A. After Effects v1.2.1
 
-The repository now also contains a separate AE CEP product. It does not turn the TD component into HTML or change the native TOX. `ae/VeloAE/` holds the local panel and ExtendScript host bridge; `ae/tools/` holds offline and package checks; `ae/packaging/` holds the concise offline bilingual guides.
+The repository also contains a separate AE CEP product. It does not turn the TD component into HTML or change the native TOX. `ae/VeloAE/` holds the local panel and ExtendScript host bridge; `ae/tools/` holds offline and package checks; `ae/packaging/` holds the concise offline bilingual guides.
 
-- The manifest and host engine are `1.2.0`; TD's `VERSION` remains `1.1.0`.
-- `js/curve-model.js` supplies curve, derivative, multi-segment and smoothing mathematics. `js/main.js` handles CEP rendering and interaction, including pointer-based preset reordering with the same `reorderPreset()` used by browser HTML5 drop.
-- `jsx/hostscript.jsx` owns actual AE inspection, application, undo groups, EaseCopy and native preset-file export. Array numerical pastes restore target easing only after all values have been written.
-- Segment state-key serialization is cached by segment-array reference. Scalar values are always read afresh, and replacing segments invalidates the cache. The 12-segment microbenchmark records identical keys and eliminates repeated serialization after warmup; its timing is not a whole-AE speed claim. Real CEP preview measurement recorded 90 segment serializations before caching and 0 afterward, with identical curve output and continuing preview draws.
+- The manifest and host engine are `1.2.1`; TD's `VERSION` remains `1.1.0`.
+- `readCurve()` imports selected keyframe values, times and native tangents. `Inspect` remains read-only and does not overwrite the editor. Arrays can use one shared ease object or separate dimensional eases; constant dimensions are not collapsed into a mismatched curve.
+- Multi-anchor Bezier writes native keys and per-span Temporal Ease where AE supports the shape, replacing redundant selected anchors. Hidden shape knots and linked spatial negative speeds use explicitly reported local sampling rather than silent native distortion. Legacy single-segment scalar, Elastic/Bounce and EaseCopy behavior is retained.
+- Segment state-key serialization remains cached by segment-array reference, with scalar values always read afresh. The measured key-path timing is not a whole-AE speed claim.
 - The native tab is plain `Velo`. Compact status remains next to the mode buttons; longer feedback uses a separate notification. CEP content can grow and scroll internally, but outer-window expansion is not claimed.
-- Offline regressions and package checks total **947**. macOS / AE 2026 (`26.5x89`) has separate host, preset/settings, curve/preview and native-file evidence. Windows receives source/path/archive checks, not a Windows AE runtime certification.
-- Read `ae/README.md`, `docs/RELEASE_v1.2.0.md` and `docs/VERIFICATION.md` for the exact feature and evidence boundaries. The one-click cross-host installer remains future work.
+- Offline regressions and package checks total **1,015**, with **11** real macOS / AE 2026 native-curve checks. Test compositions and original settings are restored. Windows receives native installer build and CLI checks, not a Windows AE runtime certification.
+- `ae/installer/` provides a Tkinter native UI, payload/hash verification, complete backup, rollback and restore. Its 22 tests also cover bounded backup labels and platform version inputs. Native macOS install/upgrade/restore is verified with real backup hashes; Chinese and English content has measured height and reduced-window scrolling checks. macOS and Windows packages must be built on their respective platforms, with bundle/PE version metadata verified during the build. Cavalry and TouchDesigner installers remain future work.
+- Read `ae/README.md`, `docs/RELEASE_v1.2.1.md` and `docs/VERIFICATION.md` for the exact feature and evidence boundaries.
 
 Read next only as needed:
 

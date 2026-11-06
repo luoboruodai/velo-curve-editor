@@ -1,0 +1,53 @@
+{
+  "format": "velo-icon-assets",
+  "files": {
+    "icon16.png": {
+      "bytes": 209,
+      "sha256": "6a8db19d70194ce27d712a4b86d7ca7a2733ac4d53449edabca5ff0a751d6c1e"
+    },
+    "icon24.png": {
+      "bytes": 321,
+      "sha256": "1d6fc8f2164dfbf9bf6dfea493fe299751cf88e8f37a4d9a1dc766eea0cef892"
+    },
+    "icon32.png": {
+      "bytes": 384,
+      "sha256": "b2f251d25c6edb104ff7ac287ede05b75ffd52b8bb08f63652da4e0190803f33"
+    },
+    "icon48.png": {
+      "bytes": 550,
+      "sha256": "cc376f3918ad7026644b8857f56f088537fb165af24b35f87c08961dae1a41c0"
+    },
+    "icon64.png": {
+      "bytes": 722,
+      "sha256": "2ba75f992f33a7fd8e96d9186d1645f5e00d210aa0bea0726e217e3ff7635c40"
+    },
+    "icon128.png": {
+      "bytes": 1344,
+      "sha256": "af3098537775aebada5061b8a422f4b361166b26fcb66fb45d8a65b19fe10c00"
+    },
+    "icon256.png": {
+      "bytes": 1967,
+      "sha256": "832d902d9a8044b7f73e9c3e3ea3745486a3a3d95f19b1b0a439b97620eae384"
+    },
+    "icon512.png": {
+      "bytes": 4327,
+      "sha256": "d9a735dfca5c50564c642e9ce083953eadbd79363575c5740c59a8a245aacf60"
+    },
+    "icon1024.png": {
+      "bytes": 11096,
+      "sha256": "736e386d570db1726ce1dbf3060c24ae1cb417941c2cf54e65898b367fc15f0d"
+    },
+    "Velo.ico": {
+      "bytes": 5615,
+      "sha256": "58dfa3932caac6df32276f47d28653e9672ede7dbdb24564f59f0e5e05a59012"
+    },
+    "Velo.icns": {
+      "bytes": 77746,
+      "sha256": "ae15e9c11a03c05f6fc829f0ba3f2376478b5181ed0087cf5561baf6183e80c1"
+    },
+    "icon32.ppm": {
+      "bytes": 3085,
+      "sha256": "5ccf0661609e8792d73cf3e1f7e006e7f84cc6ef1e555f603c431b82afbf1c20"
+    }
+  }
+}

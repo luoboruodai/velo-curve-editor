@@ -28,7 +28,7 @@ with tempfile.TemporaryDirectory(prefix='velo-release-test-') as temporary:
     report = builder.build_release(first, allow_dirty=True, source_date_epoch=1767225600)
     rebuilt = builder.build_release(second, allow_dirty=True, source_date_epoch=1767225600)
     expected = sorted([f'com.velo.curveeditor/{name}' for name in builder.PANEL_FILES] + list(builder.GUIDE_FILES))
-    check(report['version'] == '1.2.0', 'release version is synchronized across the manifest and host')
+    check(report['version'] == '1.2.1', 'release version is synchronized across the manifest and host')
     check(report['sha256'] == rebuilt['sha256'] and first.read_bytes() == second.read_bytes(), 'identical source and timestamp produce an identical ZIP')
     check(report['sourceDirty'] == rebuilt['sourceDirty'], 'build reports the actual reviewed-source state')
     with zipfile.ZipFile(first) as archive:
@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='velo-release-test-') as temporary:
         check(archive.namelist() == expected, 'archive contains only the explicit panel and offline-guide whitelist')
         check(all('\\' not in name and not name.startswith('/') and '..' not in Path(name).parts for name in archive.namelist()), 'archive paths are portable and cannot escape the destination')
         manifest = archive.read('com.velo.curveeditor/CSXS/manifest.xml').decode('utf-8')
-        check(manifest.count('1.2.0') == 2, 'both bundled manifest versions are correct')
+        check(manifest.count('1.2.1') == 2, 'both bundled manifest versions are correct')
         check(archive.read('README.md') == (ROOT / 'packaging' / 'README.md').read_bytes(), 'offline Chinese guide matches the reviewed bytes')
         check(archive.read('README.en.md') == (ROOT / 'packaging' / 'README.en.md').read_bytes(), 'offline English guide matches the reviewed bytes')
         check(all(not name.endswith(('.debug', '.pyc', '.log')) and 'private/' not in name for name in archive.namelist()), 'debug files, private verification and logs are excluded')
@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory(prefix='velo-release-test-') as temporary:
     manifest_path = first.with_suffix('.manifest.json')
     recorded = json.loads(manifest_path.read_text(encoding='utf-8'))
     check(recorded['bytes'] == first.stat().st_size and recorded['files'], 'final size and per-file hashes are recorded')
-    checksums = first.parent / 'VeloAE_v1.2.0_SHA256SUMS.txt'
+    checksums = first.parent / 'VeloAE_v1.2.1_SHA256SUMS.txt'
     check(checksums.read_text(encoding='utf-8').strip() == f'{rebuilt["sha256"]}  {second.name}', 'external checksum points to the latest validated ZIP filename')
     for guide in ('README.md', 'README.en.md'):
         builder.validate_guide(ROOT / 'packaging' / guide)

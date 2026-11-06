@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 
 release/
+ae/installer/payload/
+dist/installer-build/

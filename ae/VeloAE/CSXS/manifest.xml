@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="7.0" ExtensionBundleId="com.velo.curveeditor" ExtensionBundleVersion="1.2.0" ExtensionBundleName="Velo">
+<ExtensionManifest Version="7.0" ExtensionBundleId="com.velo.curveeditor" ExtensionBundleVersion="1.2.1" ExtensionBundleName="Velo">
   <ExtensionList>
-    <Extension Id="com.velo.curveeditor" Version="1.2.0" />
+    <Extension Id="com.velo.curveeditor" Version="1.2.1" />
   </ExtensionList>
   <ExecutionEnvironment>
     <HostList>

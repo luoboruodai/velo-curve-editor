@@ -71,8 +71,8 @@ input[type="range"]::-moz-range-thumb { width: 15px; height: 15px; border: 0; bo
 .action-btn-group { display: flex; gap: 5px; }
 .action-btn { flex: 1; height: 30px; border: 0; border-radius: 4px; background: var(--btn-bg); transition: background-color .15s ease, transform .1s ease; }
 .host-actions { display: flex; gap: 6px; }
-#inspectBtn { flex: 0 0 96px; }
-#applyBtn { flex: 1; height: 36px; border: 0; border-radius: 4px; background: var(--btn-active-bg); color: white; font-size: 14px; transition: background-color .15s ease, transform .1s ease; }
+#inspectBtn, #readCurveBtn { flex: 0 1 96px; min-width: 0; padding: 0 8px; white-space: nowrap; }
+#applyBtn { flex: 1; min-width: 72px; height: 36px; border: 0; border-radius: 4px; background: var(--btn-active-bg); color: white; font-size: 14px; transition: background-color .15s ease, transform .1s ease; }
 #applyBtn:hover { background: var(--btn-active-hover-bg); }
 .secondary-btn { min-height: 30px; padding: 0 12px; border: 1px solid var(--input-border); border-radius: 4px; background: var(--btn-bg); transition: background-color .15s ease, transform .1s ease; }
 .secondary-btn.full-width { width: 100%; margin-top: 8px; }

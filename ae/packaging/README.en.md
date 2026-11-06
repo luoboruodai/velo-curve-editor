@@ -1,10 +1,10 @@
-# Velo 1.2.0 · Curve Editor for After Effects
+# Velo 1.2.1 · Curve Editor for After Effects
 
 [中文说明](README.md)
 
 Velo is a local After Effects CEP panel for Bezier, Elastic and Bounce curves, true derivative views and numerical keyframe application.
 
-This ZIP contains a portable panel, not a one-click installer for AE, Cavalry or TouchDesigner. The same files work at the file-structure level on macOS and Windows. No network access, Node.js, Python or additional extensions are required.
+This ZIP contains a portable panel. The same files work at the file-structure level on macOS and Windows, with no network access, Node.js, Python or additional extensions required. The release also includes native `VeloInstaller.app` for macOS and `VeloInstaller.exe` for Windows, with offline payload verification, complete backup and rollback. Cavalry and TouchDesigner installers are not included yet.
 
 ## Install on macOS
 
@@ -59,24 +59,24 @@ Restart AE after changing this preference. It enables local debug extensions; it
 ## Basic use
 
 1. Select at least two consecutive keyframes of a numerical property in the target composition.
-2. Choose a preset or edit the curve handles. Bezier supports value and speed views.
-3. Use `Inspect` to confirm the property and selection, then choose `Apply`.
+2. Choose `Read` to import existing values and tangents. `Inspect` only checks the selection and never replaces the editor curve.
+3. Adjust the curve or choose a preset. Bezier supports value and speed views; then choose `Apply`.
 4. One AE undo restores the state before that application.
 
-Features include multi-segment shape-preserving insertion and deletion, tangent snapping, adaptive smoothing, multi-property application, EaseCopy, preset ordering/import/export, themes and four interface languages. Arrays, Elastic/Bounce and multi-segment curves use sampled keyframes; scalar single-segment Bezier uses native AE Temporal Ease.
+Features include multi-segment shape-preserving insertion and deletion, tangent snapping, adaptive smoothing, multi-property application, EaseCopy, preset ordering/import/export, themes and four interface languages. Multi-segment Bezier now writes native keyframes and Temporal Ease at visible anchors for scalars and equal-length arrays rather than baking the whole curve. Visible spans containing shape-preserving hidden anchors use explicitly reported shape-preserving samples. AE clamps negative speeds on shared spatial properties such as Position to zero, so those spans also use local sampling instead of claiming unsupported native negative speeds. Elastic/Bounce and the legacy single-segment array path retain sampled keyframes.
 
 ## Validation and platform boundaries
 
 - The manifest declares AE `17.0` and later with CSXS `7.0`. Only hosts exercised by real tests are listed as verified in the release notes.
 - macOS validation uses After Effects 2026 (`26.5x89`). Other AE versions have not all been tested.
 - The Windows package has structural, path, syntax and archive checks, **not a Windows AE host validation**. This is not a claim of full Windows verification.
-- This release targets AE only. TouchDesigner has a separate TD package in the repository. A one-click AE/Cavalry/TouchDesigner installer has not been released.
+- This release provides the AE panel and its one-click installer. TouchDesigner has a separate TD package in the repository; Cavalry and TouchDesigner installers are not included yet.
 
 ## Links
 
 These links require internet access; installation and normal use do not.
 
-- [v1.2.0 release notes and checksums](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.2.0)
-- [Full English guide](https://github.com/luoboruodai/velo-curve-editor/blob/v1.2.0/README.md)
+- [v1.2.1 release notes and checksums](https://github.com/luoboruodai/velo-curve-editor/releases/tag/v1.2.1)
+- [Full English guide](https://github.com/luoboruodai/velo-curve-editor/blob/v1.2.1/README.md)
 - [中文指南](README.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
